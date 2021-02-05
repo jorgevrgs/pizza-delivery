@@ -1,0 +1,6 @@
+### NOT FOUND
+GET https://localhost:3001/ping?foo=bar
+
+
+### GET
+GET https://localhost:3001/customers
