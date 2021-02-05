@@ -5,7 +5,7 @@ const Menu = require("./menu");
 const Order = require("./order");
 
 const _data = require("../data");
-const helpers = require("../helpers/password");
+const helpers = require("../helpers");
 
 module.exports = class Model {
   /**
@@ -51,14 +51,27 @@ module.exports = class Model {
     }
   }
 
-  async findOne({ id }) {
+  async findOne(id) {
     try {
       const data = await _data.read(this.plural, id);
 
       return data;
     } catch (error) {
       helpers.log.error(error);
-      return {};
+      return false;
+    }
+  }
+
+  async create(data) {
+    try {
+      const id = helpers.tools.generateId();
+      const obj = { id, ...data };
+      await _data.create(this.plural, id, obj);
+
+      return true;
+    } catch (error) {
+      helpers.log.error(error);
+      return false;
     }
   }
 

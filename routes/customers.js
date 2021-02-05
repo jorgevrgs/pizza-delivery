@@ -4,6 +4,8 @@
 
 // Dependencies
 const helpers = require("../helpers");
+const Model = require("../models");
+const User = new Model("customer");
 
 // customers
 let handlers = {};
@@ -23,75 +25,59 @@ handlers._customers = {};
 // customers - post
 // Required data: firstName, lastName, email, password, tosAgreement
 // Optional data: none
-handlers._customers.post = function (data, callback) {
+handlers._customers.post = async function (req, callback) {
+  helpers.log.warn(req.body);
   // Check that all required fields are filled out
   const firstName =
-    typeof data.body.firstName === "string" &&
-    data.body.firstName.trim().length > 0
-      ? data.body.firstName.trim()
+    typeof req.body.firstName === "string" &&
+    req.body.firstName.trim().length > 0
+      ? req.body.firstName.trim()
       : false;
 
   const lastName =
-    typeof data.body.lastName === "string" &&
-    data.body.lastName.trim().length > 0
-      ? data.body.lastName.trim()
+    typeof req.body.lastName === "string" && req.body.lastName.trim().length > 0
+      ? req.body.lastName.trim()
       : false;
 
   const email =
-    typeof data.body.email === "string" && data.body.email.trim().length === 10
-      ? data.body.email.trim()
-      : false;
+    typeof req.body.email === "string" ? req.body.email.trim() : false;
 
   const password =
-    typeof data.body.password === "string" &&
-    data.body.password.trim().length > 0
-      ? data.body.password.trim()
+    typeof req.body.password === "string" && req.body.password.trim().length > 0
+      ? req.body.password.trim()
       : false;
 
   const tosAgreement =
-    typeof data.body.tosAgreement === "boolean" &&
-    data.body.tosAgreement === true
+    typeof req.body.tosAgreement === "boolean" && req.body.tosAgreement === true
       ? true
       : false;
 
   if (firstName && lastName && email && password && tosAgreement) {
     // Make sure the user doesnt already exist
-    _data.read("customers", email, function (err, data) {
-      if (err) {
-        // Hash the password
+    try {
+      const user = await User.findOne(email);
+
+      if (user) {
+        callback(409, "Conflict");
+      } else {
         const hashedPassword = helpers.password.hash(password);
 
-        // Create the user object
-        if (hashedPassword) {
-          const userObject = {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            hashedPassword: hashedPassword,
-            tosAgreement: true,
-          };
-
-          // Store the user
-          _data.create("customers", email, userObject, function (err) {
-            if (!err) {
-              callback(200);
-            } else {
-              console.log(err);
-              callback(500, { Error: "Could not create the new user" });
-            }
-          });
-        } else {
-          callback(500, { Error: "Could not hash the user's password." });
-        }
-      } else {
-        // User alread exists
-        callback(400, {
-          Error: "A user with that email number already exists",
+        const createdUser = await User.create({
+          firstName,
+          lastName,
+          email,
+          password: hashedPassword,
+          tosAgreement: true,
         });
+
+        callback(200, createdUser);
       }
-    });
+    } catch (error) {
+      helpers.log.error(error);
+      callback(500, error);
+    }
   } else {
-    callback(400, { Error: "Missing required fields" });
+    callback(400, "badRequest");
   }
 };
 
