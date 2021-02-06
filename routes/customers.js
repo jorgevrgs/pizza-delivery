@@ -55,20 +55,23 @@ handlers._customers.post = async function (req, callback) {
   if (firstName && lastName && email && password && tosAgreement) {
     // Make sure the user doesnt already exist
     try {
-      const user = await User.findOne(email);
+      // const hashedPassword = helpers.password.hash(password);
+
+      const objToCreate = {
+        firstName,
+        lastName,
+        email,
+        password,
+        tosAgreement: true,
+      };
+
+      const id = User.generateId(objToCreate);
+      const user = await User.findOne(id);
 
       if (user) {
         callback(409, "Conflict");
       } else {
-        const hashedPassword = helpers.password.hash(password);
-
-        const createdUser = await User.create({
-          firstName,
-          lastName,
-          email,
-          password: hashedPassword,
-          tosAgreement: true,
-        });
+        const createdUser = await User.create(objToCreate);
 
         callback(200, createdUser);
       }

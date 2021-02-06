@@ -40,6 +40,22 @@ module.exports = class Model {
     }
   }
 
+  /**
+   *
+   * @param {object} data Object to be stored in database
+   */
+  generateId(data) {
+    if (typeof this.model.primaryKey !== "undefined") {
+      if (data[this.model.primaryKey] !== "undefined") {
+        return helpers.password.hash(data[this.model.primaryKey]);
+      } else {
+        return false;
+      }
+    } else {
+      return helpers.tools.generateId();
+    }
+  }
+
   async find(criteria = {}) {
     try {
       const data = await _data.list(this.plural, criteria);
@@ -64,11 +80,22 @@ module.exports = class Model {
 
   async create(data) {
     try {
-      const id = helpers.tools.generateId();
+      const id = this.generateId(data);
       const obj = { id, ...data };
+
+      if (typeof this.model.beforeCreate === "function") {
+        Object.assign(obj, this.model.beforeCreate(obj));
+      }
+
       await _data.create(this.plural, id, obj);
 
-      return true;
+      let response = await _data.read(this.plural, id);
+
+      if (typeof this.model.beforeResponse === "function") {
+        Object.assign(response, this.model.beforeResponse(response));
+      }
+
+      return response;
     } catch (error) {
       helpers.log.error(error);
       return false;

@@ -7,6 +7,10 @@ const crypto = require("crypto");
 
 let tools = {};
 
+/**
+ *
+ * @param {string} str JSON string to be parse into an object
+ */
 tools.parseJsonToObject = function (str) {
   try {
     const obj = JSON.parse(str);
@@ -16,7 +20,12 @@ tools.parseJsonToObject = function (str) {
   }
 };
 
-// Create a string of random alphanumeric characters, of a given length
+/**
+ * Create a string of random alphanumeric characters, of a given length
+ *
+ * @param {number} length
+ * @param {string} flag
+ */
 tools.createRandomString = function (length = 8, flag = "ALPHANUMERIC") {
   length = parseInt(length);
 
@@ -59,6 +68,10 @@ tools.createRandomString = function (length = 8, flag = "ALPHANUMERIC") {
   return result;
 };
 
+/**
+ *
+ * @param {number} length
+ */
 tools.getBytes = function (length) {
   length = parseInt(length);
 
@@ -75,10 +88,30 @@ tools.getBytes = function (length) {
   return buf.toString("hex"); // 'utf8'
 };
 
+/**
+ *
+ * @param {object} origin
+ * @param {array} omit
+ */
+tools.omit = function (origin, omit) {
+  omit.forEach((key) => delete origin[key]);
+
+  return origin;
+};
+
+/**
+ *
+ * @param {string} str
+ */
 tools.ord = function (str) {
   return str.charCodeAt(0);
 };
 
+/**
+ *
+ * @param {string} str Original string
+ * @param {string} chr Character to be removed
+ */
 tools.trim = function (str, chr) {
   const rgxtrim = !chr
     ? new RegExp("^\\s+|\\s+$", "g")
@@ -86,16 +119,30 @@ tools.trim = function (str, chr) {
   return str.replace(rgxtrim, "");
 };
 
+/**
+ *
+ * @param {string} str Original string
+ * @param {string} chr Character to be removed
+ */
 tools.rtrim = function (str, chr) {
   const rgxtrim = !chr ? new RegExp("\\s+$") : new RegExp(chr + "+$");
   return str.replace(rgxtrim, "");
 };
 
+/**
+ *
+ * @param {string} str Original string
+ * @param {string} chr Character to be removed
+ */
 tools.ltrim = function (str, chr) {
   const rgxtrim = !chr ? new RegExp("^\\s+") : new RegExp("^" + chr + "+");
   return str.replace(rgxtrim, "");
 };
 
+/**
+ *
+ * @param {number} length
+ */
 tools.generateId = function (length = 16) {
   return crypto.randomBytes(length).toString("hex");
 };

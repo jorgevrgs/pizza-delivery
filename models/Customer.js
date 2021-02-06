@@ -1,4 +1,7 @@
+const helpers = require("../helpers");
+
 module.exports = {
+  primaryKey: "email",
   attributtes: {
     firstName: {
       type: "string",
@@ -18,6 +21,7 @@ module.exports = {
     password: {
       type: "string",
       required: true,
+      protected: true,
     },
     address: {
       type: "object",
@@ -29,5 +33,27 @@ module.exports = {
         country: "US",
       },
     },
+  },
+  beforeCreate(data) {
+    if (typeof data.password !== "undefined") {
+      data.password = helpers.password.hash(data.password);
+    }
+
+    return data;
+  },
+  beforeUpdate(data) {
+    if (typeof data.password !== "undefined") {
+      data.password = helpers.password.hash(data.password);
+    }
+
+    return data;
+  },
+  beforeResponse(data) {
+    const keys = Object.keys(this.attributtes);
+    const omit = keys.filter((att) => !!this.attributtes[att].protected);
+
+    data = helpers.tools.omit(data, omit);
+
+    return data;
   },
 };
