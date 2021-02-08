@@ -111,14 +111,14 @@ module.exports = class Model {
     }
   }
 
-  async update({ id }, data) {
+  async update(id, data) {
     try {
       await _data.update(this.plural, id, data);
 
-      return true;
+      return await this.findOne(id);
     } catch (error) {
       helpers.log.error(error);
-      return false;
+      throw new Error(error.message);
     }
   }
 

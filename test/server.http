@@ -36,3 +36,12 @@ POST https://localhost:3001/customers
 ### GET /customers
 GET https://localhost:3001/customers?id={{userId}}
 token: {{tokenId}}
+
+### PUT /customers
+PUT https://localhost:3001/customers
+token: {{tokenId}}
+
+{
+  "email": "user10@example.com",
+  "firstName": "Johny"
+}

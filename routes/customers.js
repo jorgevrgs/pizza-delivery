@@ -100,8 +100,11 @@ methods.post = async function (req, res) {
   return { req, res };
 };
 
-// Required data: email
-// Optional data: none
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
 methods.get = async function (req, res) {
   try {
     // Check that email number is valid
@@ -121,9 +124,78 @@ methods.get = async function (req, res) {
           res.sendStatus(404);
         }
       } else {
-        res.sendStatus(403, {
-          Error: "Missing required token in header, or token is invalid.",
-        });
+        res.sendStatus(403);
+      }
+    }
+  } catch (error) {
+    helpers.log.error(error);
+    res.sendStatus(500);
+  } finally {
+    return { req, res };
+  }
+};
+
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+methods.put = async function (req, res) {
+  try {
+    if (!req.userId) {
+      res.sendStatus(403);
+    } else {
+      // Check for required field
+      const email =
+        typeof req.body.email === "string" ? req.body.email.trim() : false;
+
+      // Check for optional fields
+      const firstName =
+        typeof req.body.firstName === "string" &&
+        req.body.firstName.trim().length > 0
+          ? req.body.firstName.trim()
+          : false;
+
+      const lastName =
+        typeof req.body.lastName === "string" &&
+        req.body.lastName.trim().length > 0
+          ? req.body.lastName.trim()
+          : false;
+
+      const password =
+        typeof req.body.password === "string" &&
+        req.body.password.trim().length > 0
+          ? req.body.password.trim()
+          : false;
+
+      // Error if email is invalid
+      if (!email || !(firstName || lastName || password)) {
+        helpers.log.warn("Missing required parameters");
+        res.sendStatus(400);
+      } else {
+        // Lookup the user
+        const id = User.generateId({ email });
+
+        const userData = await User.findOne(id);
+
+        if (!userData) {
+          res.sendStatus(404);
+        } else {
+          // Update the fields if necessary
+          if (firstName) {
+            userData.firstName = firstName;
+          }
+          if (lastName) {
+            userData.lastName = lastName;
+          }
+          if (password) {
+            userData.hashedPassword = helpers.password.hash(password);
+          }
+
+          const updatedUser = await User.update(id, userData);
+
+          res.send(updatedUser);
+        }
       }
     }
   } catch (error) {
@@ -135,154 +207,5 @@ methods.get = async function (req, res) {
 };
 
 // Required data: email
-// Optional data: firstName, lastName, password (at least one must be specified)
-methods.put = function (req, callback) {
-  // Check for required field
-  const email =
-    typeof req.body.email === "string" && req.body.email.trim().length === 10
-      ? req.body.email.trim()
-      : false;
-
-  // Check for optional fields
-  const firstName =
-    typeof req.body.firstName === "string" &&
-    req.body.firstName.trim().length > 0
-      ? req.body.firstName.trim()
-      : false;
-
-  const lastName =
-    typeof req.body.lastName === "string" && req.body.lastName.trim().length > 0
-      ? req.body.lastName.trim()
-      : false;
-
-  const password =
-    typeof req.body.password === "string" && req.body.password.trim().length > 0
-      ? req.body.password.trim()
-      : false;
-
-  // Error if email is invalid
-  if (email) {
-    // Error if nothing is sent to update
-    if (firstName || lastName || password) {
-      // Get token from headers
-      const token =
-        typeof req.headers.token === "string" ? req.headers.token : false;
-
-      // Verify that the given token is valid for the email number
-      handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
-        if (tokenIsValid) {
-          // Lookup the user
-          _data.read("customers", email, function (err, userData) {
-            if (!err && userData) {
-              // Update the fields if necessary
-              if (firstName) {
-                userData.firstName = firstName;
-              }
-              if (lastName) {
-                userData.lastName = lastName;
-              }
-              if (password) {
-                userData.hashedPassword = helpers.password.hash(password);
-              }
-              // Store the new updates
-              _data.update("customers", email, userData, function (err) {
-                if (!err) {
-                  callback(200);
-                } else {
-                  callback(500, { Error: "Could not update the user." });
-                }
-              });
-            } else {
-              callback(403, {
-                Error: "Missing required token in header, or token is invalid.",
-              });
-            }
-          });
-        } else {
-          callback(403, {
-            Error: "Missing required token in header, or token is invalid.",
-          });
-        }
-      });
-    } else {
-      callback(400, { Error: "Missing fields to update." });
-    }
-  } else {
-    callback(400, { Error: "Missing required field." });
-  }
-};
-
-// Required data: email
 // Cleanup old checks associated with the user
-methods.delete = function (req, callback) {
-  // Check that email number is valid
-  const email =
-    typeof req.query.email === "string" && req.query.email.trim().length === 10
-      ? req.query.email.trim()
-      : false;
-
-  if (email) {
-    // Get token from headers
-    const token =
-      typeof req.headers.token === "string" ? req.headers.token : false;
-
-    // Verify that the given token is valid for the email number
-    handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
-      if (tokenIsValid) {
-        // Lookup the user
-        _data.read("customers", email, function (err, data) {
-          if (!err && userData) {
-            _data.delete("customers", email, function (err) {
-              if (!err) {
-                // Delete each of the checks associated with the user
-                const userChecks =
-                  typeof userData.checks === "object" &&
-                  userData.checks instanceof Array
-                    ? userData.checks
-                    : [];
-
-                const checksToDelete = userChecks.length;
-                if (checksToDelete > 0) {
-                  let checksDeleted = 0;
-                  let deletionErrors = false;
-                  // Loop through the checks
-                  userChecks.forEach(function (checkId) {
-                    // Delete the check
-                    _data.delete("checks", checkId, function (err) {
-                      if (err) {
-                        deletionErrors = true;
-                      }
-                      checksDeleted++;
-                      if (checksDeleted === checksToDelete) {
-                        if (!deletionErrors) {
-                          callback(200);
-                        } else {
-                          callback(500, {
-                            Error:
-                              "Errors encountered while attempting to delete all of the user's checks. All checks may not have been deleted from the system successfully.",
-                          });
-                        }
-                      }
-                    });
-                  });
-                } else {
-                  callback(200);
-                }
-              } else {
-                callback(500, { Error: "Could not delete the specified user" });
-              }
-            });
-          } else {
-            callback(400, { Error: "Could not find the specified user." });
-          }
-        });
-      } else {
-        callback(403, {
-          Error: "Missing required token in header, or token is invalid.",
-        });
-      }
-    });
-  } else {
-    callback(400, { Error: "Missing required field" });
-  }
-};
+methods.delete = function (req, callback) {};
