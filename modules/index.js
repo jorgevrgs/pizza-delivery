@@ -4,57 +4,27 @@
 
 const helpers = require("../helpers");
 
-// Define all the handlers
-let routes = {};
-
-// Ping
-routes.ping = function (req, res) {
-  res.send({
-    method: req.method,
-    body: req.getBody(),
-  });
-};
-
-// Not-Found
-routes.notFound = function (_req, res) {
-  res.sendStatus(404);
-};
-
-routes.clientError = function (_req, res) {
-  res.sendStatus(res.getStatusCode());
-};
-
 /**
  * @returns {Promise}
  */
 module.exports = function () {
   return new Promise(async (resolve, reject) => {
     try {
-      // Helpers
-      const helperModules = await helpers.files.loadModules("helpers");
-
-      // Models
-      const models = require("../models");
-
-      const userRoutes = await helpers.files.loadModules("routes");
-      Object.assign(routes, userRoutes);
-
-      // Middlewares
-      const middlewares = await helpers.files.loadModules("middlewares");
+      const modules = ["helpers", "models", "middlewares", "routes"];
+      const result = await helpers.files.loadModules(modules);
 
       // Classes
       const Model = require("../classes/Model");
       const Request = require("../classes/Request");
       const Response = require("../classes/Response");
+      const Route = require("../classes/Route");
 
       resolve({
-        helpers: helperModules,
-        middlewares,
-        models,
-        routes,
+        ...result,
         Model,
         Request,
         Response,
+        Route,
       });
     } catch (error) {
       reject(error);

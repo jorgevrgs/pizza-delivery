@@ -72,18 +72,22 @@ module.exports = class Model {
     }
   }
 
-  async findOne(id) {
+  async findOne(id, clean = false) {
     try {
       const data = await _data.read(this.plural, id);
 
-      return data;
+      if (clean) {
+        return this.clean(data);
+      } else {
+        return data;
+      }
     } catch (error) {
       helpers.log.error(error);
       return false;
     }
   }
 
-  async create(data) {
+  async create(data, clean = true) {
     try {
       const id = this.generateId(data);
       const obj = { id, ...data };
@@ -96,11 +100,11 @@ module.exports = class Model {
 
       let response = await _data.read(this.plural, id);
 
-      if (typeof this.model.beforeResponse === "function") {
-        Object.assign(response, this.model.beforeResponse(response));
+      if (clean) {
+        return this.clean(response);
+      } else {
+        return response;
       }
-
-      return response;
     } catch (error) {
       helpers.log.error(error);
       return false;
@@ -127,5 +131,13 @@ module.exports = class Model {
       helpers.log.error(error);
       return false;
     }
+  }
+
+  clean(response) {
+    if (typeof this.model.beforeResponse === "function") {
+      Object.assign(response, this.model.beforeResponse(response));
+    }
+
+    return response;
   }
 };

@@ -40,7 +40,7 @@ server.unifiedServer = async function (req, res) {
   const handlers = await modules();
 
   const App = require("./classes/App");
-  const app = new App(req, res);
+  let app = new App(req, res);
 
   // Define app modules
   app.setModules(handlers);
@@ -49,15 +49,17 @@ server.unifiedServer = async function (req, res) {
   const body = await app.request.parseBody(req);
   app.request.setBody(body);
 
+  helpers.log.info(`${req.method} ${req.url}`);
+
   // @TODO: define an order and check if a payload or status code is defined
   // Run authentication
-  app.middlewares.authentication(app);
+  app.use(await app.middlewares.authentication(app));
 
   // Run middlewares
-  app.middlewares.controller(app);
+  app.use(await app.middlewares.controller(app));
 
   // Run end
-  app.middlewares.response(app);
+  app.use(app.middlewares.response(app));
 };
 
 // Define the request router

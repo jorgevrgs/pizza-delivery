@@ -1,18 +1,13 @@
 module.exports = function (app) {
-  /**
-   * @param {Request} Class
-   */
-  const response = app.response;
-
   const res = app.res;
 
-  response.json(response.getPayload());
+  app.response.json(app.response.getPayload());
 
-  for (let [key, value] of Object.entries(response.getHeaders())) {
+  for (let [key, value] of Object.entries(app.response.getHeaders())) {
     res.setHeader(key, value);
   }
-  res.writeHead(response.getStatusCode());
-  res.end(response.getBody());
+  res.writeHead(app.response.getStatusCode());
+  res.end(app.response.getBody());
 
   return app;
 };

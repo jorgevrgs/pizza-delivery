@@ -34,4 +34,12 @@ module.exports = class App {
     this.request = new this.Request(this.req);
     this.response = new this.Response(this.res);
   }
+
+  /**
+   *
+   * @param {App} app
+   */
+  use(app) {
+    Object.assign(this, app);
+  }
 };

@@ -1,40 +1,53 @@
 const helpers = require("../helpers");
-const Model = require("../models");
+const Model = require("../classes/Model");
 const User = new Model("customer");
 const Token = new Model("token");
 
-let handlers = {};
-
-// Tokens
-handlers.tokens = function (data, callback) {
-  const acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._tokens[data.method](data, callback);
-  } else {
-    callback(405);
+/**
+ *
+ * @param {Request} req Request class
+ * @param {Response} res Response class
+ */
+module.exports = async function (req, res) {
+  try {
+    const acceptableMethods = ["post", "get", "put", "delete"];
+    if (acceptableMethods.indexOf(req.method) > -1) {
+      const result = await methods[req.method](req, res);
+      req = result.req;
+      res = result.res;
+    } else {
+      res.sendStatus(405);
+    }
+  } catch (error) {
+    res.sendStatus(500);
+  } finally {
+    return { req, res };
   }
 };
 
 // Container for all the tokens methods
-handlers._tokens = {};
+let methods = {};
 
-// Tokens - post
-// Required data: email, password
-// Optional data: none
-handlers._tokens.post = async function (req, callback) {
-  const email =
-    typeof req.body.email === "string" ? req.body.email.trim() : false;
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+methods.post = async function (req, res) {
+  try {
+    const email =
+      typeof req.body.email === "string" ? req.body.email.trim() : false;
 
-  const password =
-    typeof req.body.password === "string" && req.body.password.trim().length > 0
-      ? req.body.password.trim()
-      : false;
+    const password =
+      typeof req.body.password === "string" &&
+      req.body.password.trim().length > 0
+        ? req.body.password.trim()
+        : false;
 
-  if (email && password) {
-    try {
+    if (email && password) {
       // Lookup the user who matches that email number
       const id = User.generateId({ email, password });
-      const user = await User.findOne(id);
+      const user = await User.findOne(id, false);
 
       if (user) {
         if (helpers.password.check(password, user.password)) {
@@ -43,26 +56,25 @@ handlers._tokens.post = async function (req, callback) {
             expires: Date.now() + 1000 * 60 * 60,
           });
 
-          callback(200, tokenObject);
+          res.send(tokenObject);
         } else {
-          callback(
-            401,
-            "Password did not match the specified user's stored password"
-          );
+          res.sendStatus(401);
         }
       } else {
-        callback(400, "Could not find the specified user.");
+        res.sendStatus(400);
       }
-    } catch (error) {
-      callback(500, error.message);
     }
+  } catch (error) {
+    res.send(500, error.message);
+  } finally {
+    return { req, res };
   }
 };
 
 // Tokens - get
 // Required data: id
 // Optional data: none
-handlers._tokens.get = function (data, callback) {
+methods.get = function (data, callback) {
   // Check that id is valid
   const id =
     typeof data.queryStringObject.id === "string" &&
@@ -86,7 +98,7 @@ handlers._tokens.get = function (data, callback) {
 // Tokens - put
 // Required data: id, extend
 // Optional data: none
-handlers._tokens.put = function (req, callback) {
+methods.put = function (req, callback) {
   const id =
     typeof req.body.id === "string" && req.body.id.trim().length === 20
       ? req.body.id.trim()
@@ -134,7 +146,7 @@ handlers._tokens.put = function (req, callback) {
 // Tokens - delete
 // Required data: id
 // Optional data: none
-handlers._tokens.delete = function (data, callback) {
+methods.delete = function (data, callback) {
   // Check that id is valid
   const id =
     typeof data.queryStringObject.id === "string" &&
@@ -163,7 +175,7 @@ handlers._tokens.delete = function (data, callback) {
 };
 
 // Verify if a given token id is currently valid for a given user
-handlers._tokens.verifyToken = async function (id, email) {
+methods.verifyToken = async function (id, email) {
   return new Promise((resolve) => {
     try {
       const tokenData = _data.read("tokens", id);
@@ -178,5 +190,3 @@ handlers._tokens.verifyToken = async function (id, email) {
     }
   });
 };
-
-module.exports = handlers.tokens;

@@ -4,34 +4,40 @@
 
 // Dependencies
 const helpers = require("../helpers");
-const Model = require("../models");
+const Model = require("../classes/Model");
 const User = new Model("customer");
-const Token = new Model("token");
-
-// customers
-let handlers = {};
 
 /**
  *
  * @param {Request} req Request class
  * @param {Response} res Response class
  */
-handlers.customers = function (req, res) {
-  const acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(req.method) > -1) {
-    handlers._customers[req.method](req, res);
-  } else {
-    res.sendStatus(405);
+module.exports = async function (req, res) {
+  try {
+    const acceptableMethods = ["post", "get", "put", "delete"];
+    if (acceptableMethods.indexOf(req.method) > -1) {
+      const result = await methods[req.method](req, res);
+      req = result.req;
+      res = result.res;
+    } else {
+      res.sendStatus(405);
+    }
+  } catch (error) {
+    res.sendStatus(500);
+  } finally {
+    return { req, res };
   }
 };
 
 // Container for all the customers methods
-handlers._customers = {};
+let methods = {};
 
-// customers - post
-// Required data: firstName, lastName, email, password, tosAgreement
-// Optional data: none
-handlers._customers.post = async function (req, res) {
+/**
+ *
+ * @param {Request} req
+ * @param {Response} res
+ */
+methods.post = async function (req, res) {
   // @TODO: use a validator function
   // Check that all required fields are filled out
   const firstName =
@@ -46,7 +52,9 @@ handlers._customers.post = async function (req, res) {
       : false;
 
   const email =
-    typeof req.body.email === "string" ? req.body.email.trim() : false;
+    typeof req.body.email === "string"
+      ? req.body.email.trim().toLowerCase()
+      : false;
 
   const password =
     typeof req.body.password === "string" && req.body.password.trim().length > 0
@@ -86,47 +94,49 @@ handlers._customers.post = async function (req, res) {
       res.sendStatus(500);
     }
   } else {
-    res.sendStatus(400, "badRequest");
+    res.sendStatus(400);
   }
+
+  return { req, res };
 };
 
 // Required data: email
 // Optional data: none
-handlers._customers.get = async function (req, callback) {
-  // Check that email number is valid
-  const id = typeof req.query.id === "string" ? req.query.id.trim() : false;
+methods.get = async function (req, res) {
+  try {
+    // Check that email number is valid
+    const id = typeof req.query.id === "string" ? req.query.id.trim() : false;
 
-  if (id) {
-    // Get token from headers
-    const token =
-      typeof req.headers.token === "string" ? req.headers.token : false;
+    if (id) {
+      // Get token from headers
+      const token =
+        typeof req.headers.token === "string" ? req.headers.token : false;
 
-    try {
-      // Verify that the given token is valid for the email number
-      const tokenIsValid = await handlers._tokens.verifyToken(token, id);
-      if (tokenIsValid) {
+      if (req.userId && id === req.userId) {
         const user = await User.findOne(id);
 
         if (user) {
-          callback(200, user);
+          res.send(user);
         } else {
-          callback(404);
+          res.sendStatus(404);
         }
       } else {
-        callback(403, {
+        res.sendStatus(403, {
           Error: "Missing required token in header, or token is invalid.",
         });
       }
-    } catch (error) {
-      helpers.log.error(error);
-      callback(400, error.message);
     }
+  } catch (error) {
+    helpers.log.error(error);
+    res.sendStatus(500);
+  } finally {
+    return { req, res };
   }
 };
 
 // Required data: email
 // Optional data: firstName, lastName, password (at least one must be specified)
-handlers._customers.put = function (req, callback) {
+methods.put = function (req, callback) {
   // Check for required field
   const email =
     typeof req.body.email === "string" && req.body.email.trim().length === 10
@@ -204,7 +214,7 @@ handlers._customers.put = function (req, callback) {
 
 // Required data: email
 // Cleanup old checks associated with the user
-handlers._customers.delete = function (req, callback) {
+methods.delete = function (req, callback) {
   // Check that email number is valid
   const email =
     typeof req.query.email === "string" && req.query.email.trim().length === 10
@@ -276,5 +286,3 @@ handlers._customers.delete = function (req, callback) {
     callback(400, { Error: "Missing required field" });
   }
 };
-
-module.exports = handlers.customers;

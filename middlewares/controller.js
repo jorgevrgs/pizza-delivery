@@ -1,13 +1,16 @@
-module.exports = function (app) {
-  const req = app.request;
-  const res = app.response;
-  const routes = app.routes;
-  const trimmedPath = req.trimmedPath;
+module.exports = async function (app) {
+  // Load routes
+  const route = new app.Route(app.request.trimmedPath);
+  route.setRoutes(app.routes);
 
-  const chosenHandler =
-    typeof routes[trimmedPath] !== "undefined"
-      ? routes[trimmedPath]
-      : routes.notFound;
+  // Load handler
+  const chosenHandler = route.getRoute();
 
-  chosenHandler(req, res);
+  // Run route
+  const result = await chosenHandler(app.request, app.response);
+
+  app.request = result.req;
+  app.response = result.res;
+
+  return app;
 };

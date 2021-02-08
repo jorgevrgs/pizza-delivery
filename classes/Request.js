@@ -21,15 +21,15 @@ module.exports = class Request {
 
     // Get the query string as an object
     this.query = parsedUrl.query;
-    this._body = {};
+    this.body = {};
   }
 
   getBody() {
-    return this._body;
+    return this.body;
   }
 
   setBody(body) {
-    this._body = body;
+    this.body = body;
   }
 
   /**
