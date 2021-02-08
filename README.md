@@ -1,5 +1,7 @@
 # Pizza API
 
+An example of a Pizza Delivery API for educational purposes, not for use in production environments. No dependencies.
+
 ## Run
 
 ### Development
