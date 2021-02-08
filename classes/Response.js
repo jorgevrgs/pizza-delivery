@@ -121,52 +121,52 @@ module.exports = class Response {
       // 2xx success
       case 200:
         this.setStatusCode(200);
-        this.setBody("OK");
+        this.setPayload("OK");
         break;
       case 201:
         this.setStatusCode(201);
-        this.setBody("Created");
+        this.setPayload("Created");
         break;
       case 204:
         this.setStatusCode(204);
-        this.setBody("No Content");
+        this.setPayload("No Content");
         break;
       // 4xx client errors
       case 400:
         this.setStatusCode(400);
-        this.setBody("Bad Request");
+        this.setPayload("Bad Request");
         break;
       case 401:
         this.setStatusCode(401);
-        this.setBody("Unauthorized");
+        this.setPayload("Unauthorized");
         break;
       case 403:
         this.setStatusCode(403);
-        this.setBody("Forbidden");
+        this.setPayload("Forbidden");
         break;
       case 404:
         this.setStatusCode(404);
-        this.setBody("Not Found");
+        this.setPayload("Not Found");
         break;
       case 405:
         this.setStatusCode(405);
-        this.setBody("Method Not Allowed");
+        this.setPayload("Method Not Allowed");
         break;
       case 409:
         this.setStatusCode(409);
-        this.setBody("Conflict");
+        this.setPayload("Conflict");
         break;
       case 429:
         this.setStatusCode(429);
-        this.setBody("Too Many Requests ");
+        this.setPayload("Too Many Requests ");
         break;
       case 500:
         this.setStatusCode(500);
-        this.setBody("Internal Server Error");
+        this.setPayload("Internal Server Error");
         break;
       default:
         this.setStatusCode(code);
-        this.setBody(code);
+        this.setPayload(code);
     }
   }
 };
