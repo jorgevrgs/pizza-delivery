@@ -1,9 +1,9 @@
-const Customer = require("./customer");
-const Food = require("./food");
-const Item = require("./item");
-const Menu = require("./menu");
-const Order = require("./order");
-const Token = require("./token");
+const Customer = require("../models/Customer");
+const Food = require("../models/Food");
+const Item = require("../models/Item");
+const Menu = require("../models/Menu");
+const Order = require("../models/Order");
+const Token = require("../models/Token");
 
 const _data = require("../data");
 const helpers = require("../helpers");

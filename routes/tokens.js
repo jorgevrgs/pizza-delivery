@@ -1,3 +1,8 @@
+const helpers = require("../helpers");
+const Model = require("../models");
+const User = new Model("customer");
+const Token = new Model("token");
+
 let handlers = {};
 
 // Tokens
@@ -14,57 +19,43 @@ handlers.tokens = function (data, callback) {
 handlers._tokens = {};
 
 // Tokens - post
-// Required data: phone, password
+// Required data: email, password
 // Optional data: none
-handlers._tokens.post = function (data, callback) {
-  const phone =
-    typeof data.payload.phone === "string" &&
-    data.payload.phone.trim().length === 10
-      ? data.payload.phone.trim()
-      : false;
+handlers._tokens.post = async function (req, callback) {
+  const email =
+    typeof req.body.email === "string" ? req.body.email.trim() : false;
 
   const password =
-    typeof data.payload.password === "string" &&
-    data.payload.password.trim().length > 0
-      ? data.payload.password.trim()
+    typeof req.body.password === "string" && req.body.password.trim().length > 0
+      ? req.body.password.trim()
       : false;
 
-  if (phone && password) {
-    // Lookup the user who matches that phone number
-    _data.read("users", phone, function (err, userData) {
-      if (!err && userData) {
-        // Hash the sent password, and compare it to the password stored in the user object
-        const hashedPassword = helpers.hash(password);
-        if (hashedPassword === userData.hashedPassword) {
-          // If valid, create a new token with a random name. Set an expiration date 1 hour in the future.
-          const tokenId = helpers.createRandomString(20);
-          const expires = Date.now() + 1000 * 60 * 60;
-          const tokenObject = {
-            phone: phone,
-            id: tokenId,
-            expires: expires,
-          };
+  if (email && password) {
+    try {
+      // Lookup the user who matches that email number
+      const id = User.generateId({ email, password });
+      const user = await User.findOne(id);
 
-          // Store the token
-          _data.create("tokens", tokenId, tokenObject, function (err) {
-            if (!err) {
-              callback(200, tokenObject);
-            } else {
-              callback(500, { Error: "Could not create the new token" });
-            }
+      if (user) {
+        if (helpers.password.check(password, user.password)) {
+          const tokenObject = await Token.create({
+            email,
+            expires: Date.now() + 1000 * 60 * 60,
           });
+
+          callback(200, tokenObject);
         } else {
-          callback(400, {
-            Error:
-              "Password did not match the specified user's stored password",
-          });
+          callback(
+            401,
+            "Password did not match the specified user's stored password"
+          );
         }
       } else {
-        callback(400, { Error: "Could not find the specified user." });
+        callback(400, "Could not find the specified user.");
       }
-    });
-  } else {
-    callback(400, { Error: "Missing required field(s)." });
+    } catch (error) {
+      callback(500, error.message);
+    }
   }
 };
 
@@ -95,14 +86,14 @@ handlers._tokens.get = function (data, callback) {
 // Tokens - put
 // Required data: id, extend
 // Optional data: none
-handlers._tokens.put = function (data, callback) {
+handlers._tokens.put = function (req, callback) {
   const id =
-    typeof data.payload.id === "string" && data.payload.id.trim().length === 20
-      ? data.payload.id.trim()
+    typeof req.body.id === "string" && req.body.id.trim().length === 20
+      ? req.body.id.trim()
       : false;
 
   const extend =
-    typeof data.payload.extend === "boolean" && data.payload.extend === true
+    typeof req.body.extend === "boolean" && req.body.extend === true
       ? true
       : false;
 
@@ -172,18 +163,18 @@ handlers._tokens.delete = function (data, callback) {
 };
 
 // Verify if a given token id is currently valid for a given user
-handlers._tokens.verifyToken = function (id, phone, callback) {
-  // Lookup the token
-  _data.read("tokens", id, function (err, tokenData) {
-    if (!err && tokenData) {
+handlers._tokens.verifyToken = async function (id, email) {
+  return new Promise((resolve) => {
+    try {
+      const tokenData = _data.read("tokens", id);
       // Check that the token is for the given user and has not expired
-      if (tokenData.phone === phone && tokenData.expires > Date.now()) {
-        callback(true);
+      if (tokenData.email === email && tokenData.expires > Date.now()) {
+        resolve(true);
       } else {
-        callback(false);
+        resolve(false);
       }
-    } else {
-      callback(false);
+    } catch (error) {
+      resolve(false);
     }
   });
 };

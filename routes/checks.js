@@ -16,39 +16,39 @@ handlers._checks = {};
 // Checks - post
 // Required data: protocol,url,method,successCodes,timeoutSeconds
 // Optional data: none
-handlers._checks.post = function (data, callback) {
+handlers._checks.post = function (req, callback) {
   // Validate inputs
   const protocol =
-    typeof data.payload.protocol === "string" &&
-    ["https", "http"].indexOf(data.payload.protocol) > -1
-      ? data.payload.protocol
+    typeof req.body.protocol === "string" &&
+    ["https", "http"].indexOf(req.body.protocol) > -1
+      ? req.body.protocol
       : false;
   const url =
-    typeof data.payload.url === "string" && data.payload.url.trim().length > 0
-      ? data.payload.url.trim()
+    typeof req.body.url === "string" && req.body.url.trim().length > 0
+      ? req.body.url.trim()
       : false;
   const method =
-    typeof data.payload.method === "string" &&
-    ["post", "get", "put", "delete"].indexOf(data.payload.method) > -1
-      ? data.payload.method
+    typeof req.body.method === "string" &&
+    ["post", "get", "put", "delete"].indexOf(req.body.method) > -1
+      ? req.body.method
       : false;
   const successCodes =
-    typeof data.payload.successCodes === "object" &&
-    data.payload.successCodes instanceof Array &&
-    data.payload.successCodes.length > 0
-      ? data.payload.successCodes
+    typeof req.body.successCodes === "object" &&
+    req.body.successCodes instanceof Array &&
+    req.body.successCodes.length > 0
+      ? req.body.successCodes
       : false;
   const timeoutSeconds =
-    typeof data.payload.timeoutSeconds === "number" &&
-    data.payload.timeoutSeconds % 1 === 0 &&
-    data.payload.timeoutSeconds >= 1 &&
-    data.payload.timeoutSeconds <= 5
-      ? data.payload.timeoutSeconds
+    typeof req.body.timeoutSeconds === "number" &&
+    req.body.timeoutSeconds % 1 === 0 &&
+    req.body.timeoutSeconds >= 1 &&
+    req.body.timeoutSeconds <= 5
+      ? req.body.timeoutSeconds
       : false;
   if (protocol && url && method && successCodes && timeoutSeconds) {
     // Get token from headers
     const token =
-      typeof data.headers.token === "string" ? data.headers.token : false;
+      typeof req.headers.token === "string" ? req.headers.token : false;
 
     // Lookup the user phone by reading the token
     _data.read("tokens", token, function (err, tokenData) {
@@ -125,12 +125,11 @@ handlers._checks.post = function (data, callback) {
 // Checks - get
 // Required data: id
 // Optional data: none
-handlers._checks.get = function (data, callback) {
+handlers._checks.get = function (req, callback) {
   // Check that id is valid
   const id =
-    typeof data.queryStringObject.id === "string" &&
-    data.queryStringObject.id.trim().length === 20
-      ? data.queryStringObject.id.trim()
+    typeof req.query.id === "string" && req.query.id.trim().length === 20
+      ? req.query.id.trim()
       : false;
   if (id) {
     // Lookup the check
@@ -138,9 +137,8 @@ handlers._checks.get = function (data, callback) {
       if (!err && checkData) {
         // Get the token that sent the request
         const token =
-          typeof data.headers.token === "string" ? data.headers.token : false;
+          typeof req.headers.token === "string" ? req.headers.token : false;
         // Verify that the given token is valid and belongs to the user who created the check
-        console.log("This is check data", checkData);
         handlers._tokens.verifyToken(
           token,
           checkData.userPhone,
@@ -165,40 +163,40 @@ handlers._checks.get = function (data, callback) {
 // Checks - put
 // Required data: id
 // Optional data: protocol,url,method,successCodes,timeoutSeconds (one must be sent)
-handlers._checks.put = function (data, callback) {
+handlers._checks.put = function (req, callback) {
   // Check for required field
   const id =
-    typeof data.payload.id === "string" && data.payload.id.trim().length === 20
-      ? data.payload.id.trim()
+    typeof req.body.id === "string" && req.body.id.trim().length === 20
+      ? req.body.id.trim()
       : false;
 
   // Check for optional fields
   const protocol =
-    typeof data.payload.protocol === "string" &&
-    ["https", "http"].indexOf(data.payload.protocol) > -1
-      ? data.payload.protocol
+    typeof req.body.protocol === "string" &&
+    ["https", "http"].indexOf(req.body.protocol) > -1
+      ? req.body.protocol
       : false;
   const url =
-    typeof data.payload.url === "string" && data.payload.url.trim().length > 0
-      ? data.payload.url.trim()
+    typeof req.body.url === "string" && req.body.url.trim().length > 0
+      ? req.body.url.trim()
       : false;
   const method =
-    typeof data.payload.method === "string" &&
-    ["post", "get", "put", "delete"].indexOf(data.payload.method) > -1
-      ? data.payload.method
+    typeof req.body.method === "string" &&
+    ["post", "get", "put", "delete"].indexOf(req.body.method) > -1
+      ? req.body.method
       : false;
   const successCodes =
-    typeof data.payload.successCodes === "object" &&
-    data.payload.successCodes instanceof Array &&
-    data.payload.successCodes.length > 0
-      ? data.payload.successCodes
+    typeof req.body.successCodes === "object" &&
+    req.body.successCodes instanceof Array &&
+    req.body.successCodes.length > 0
+      ? req.body.successCodes
       : false;
   const timeoutSeconds =
-    typeof data.payload.timeoutSeconds === "number" &&
-    data.payload.timeoutSeconds % 1 === 0 &&
-    data.payload.timeoutSeconds >= 1 &&
-    data.payload.timeoutSeconds <= 5
-      ? data.payload.timeoutSeconds
+    typeof req.body.timeoutSeconds === "number" &&
+    req.body.timeoutSeconds % 1 === 0 &&
+    req.body.timeoutSeconds >= 1 &&
+    req.body.timeoutSeconds <= 5
+      ? req.body.timeoutSeconds
       : false;
 
   // Error if id is invalid
@@ -210,7 +208,7 @@ handlers._checks.put = function (data, callback) {
         if (!err && checkData) {
           // Get the token that sent the request
           const token =
-            typeof data.headers.token === "string" ? data.headers.token : false;
+            typeof req.headers.token === "string" ? req.headers.token : false;
           // Verify that the given token is valid and belongs to the user who created the check
           handlers._tokens.verifyToken(
             token,
@@ -262,12 +260,11 @@ handlers._checks.put = function (data, callback) {
 // Checks - delete
 // Required data: id
 // Optional data: none
-handlers._checks.delete = function (data, callback) {
+handlers._checks.delete = function (req, callback) {
   // Check that id is valid
   const id =
-    typeof data.queryStringObject.id === "string" &&
-    data.queryStringObject.id.trim().length === 20
-      ? data.queryStringObject.id.trim()
+    typeof req.query.id === "string" && req.query.id.trim().length === 20
+      ? req.query.id.trim()
       : false;
   if (id) {
     // Lookup the check
@@ -275,7 +272,7 @@ handlers._checks.delete = function (data, callback) {
       if (!err && checkData) {
         // Get the token that sent the request
         const token =
-          typeof data.headers.token === "string" ? data.headers.token : false;
+          typeof req.headers.token === "string" ? req.headers.token : false;
         // Verify that the given token is valid and belongs to the user who created the check
         handlers._tokens.verifyToken(
           token,

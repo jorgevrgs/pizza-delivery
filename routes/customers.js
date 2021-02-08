@@ -6,16 +6,22 @@
 const helpers = require("../helpers");
 const Model = require("../models");
 const User = new Model("customer");
+const Token = new Model("token");
 
 // customers
 let handlers = {};
 
-handlers.customers = function (data, callback) {
+/**
+ *
+ * @param {Request} req Request class
+ * @param {Response} res Response class
+ */
+handlers.customers = function (req, res) {
   const acceptableMethods = ["post", "get", "put", "delete"];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._customers[data.method](data, callback);
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers._customers[req.method](req, res);
   } else {
-    callback(405);
+    res.sendStatus(405);
   }
 };
 
@@ -25,8 +31,8 @@ handlers._customers = {};
 // customers - post
 // Required data: firstName, lastName, email, password, tosAgreement
 // Optional data: none
-handlers._customers.post = async function (req, callback) {
-  helpers.log.warn(req.body);
+handlers._customers.post = async function (req, res) {
+  // @TODO: use a validator function
   // Check that all required fields are filled out
   const firstName =
     typeof req.body.firstName === "string" &&
@@ -69,84 +75,79 @@ handlers._customers.post = async function (req, callback) {
       const user = await User.findOne(id);
 
       if (user) {
-        callback(409, "Conflict");
+        res.sendStatus(409);
       } else {
         const createdUser = await User.create(objToCreate);
 
-        callback(200, createdUser);
+        res.send(createdUser);
       }
     } catch (error) {
       helpers.log.error(error);
-      callback(500, error);
+      res.sendStatus(500);
     }
   } else {
-    callback(400, "badRequest");
+    res.sendStatus(400, "badRequest");
   }
 };
 
 // Required data: email
 // Optional data: none
-handlers._customers.get = function (req, callback) {
+handlers._customers.get = async function (req, callback) {
   // Check that email number is valid
-  const id =
-    typeof req.query.id === "string" && req.query.id.trim().length === 10
-      ? req.query.id.trim()
-      : false;
+  const id = typeof req.query.id === "string" ? req.query.id.trim() : false;
 
   if (id) {
     // Get token from headers
     const token =
-      typeof req.headers.token === "string" ? data.headers.token : false;
-    // Verify that the given token is valid for the email number
-    handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
+      typeof req.headers.token === "string" ? req.headers.token : false;
+
+    try {
+      // Verify that the given token is valid for the email number
+      const tokenIsValid = await handlers._tokens.verifyToken(token, id);
       if (tokenIsValid) {
-        // Lookup the user
-        _data.read("customers", email, function (err, data) {
-          if (!err && data) {
-            // Remove the hashed password from the user user object before returning it to the requester
-            delete data.hashedPassword;
-            callback(200, data);
-          } else {
-            callback(404);
-          }
-        });
+        const user = await User.findOne(id);
+
+        if (user) {
+          callback(200, user);
+        } else {
+          callback(404);
+        }
       } else {
         callback(403, {
           Error: "Missing required token in header, or token is invalid.",
         });
       }
-    });
-  } else {
-    callback(400, { Error: "Missing required field" });
+    } catch (error) {
+      helpers.log.error(error);
+      callback(400, error.message);
+    }
   }
 };
 
 // Required data: email
 // Optional data: firstName, lastName, password (at least one must be specified)
-handlers._customers.put = function (data, callback) {
+handlers._customers.put = function (req, callback) {
   // Check for required field
   const email =
-    typeof data.body.email === "string" && data.body.email.trim().length === 10
-      ? data.body.email.trim()
+    typeof req.body.email === "string" && req.body.email.trim().length === 10
+      ? req.body.email.trim()
       : false;
 
   // Check for optional fields
   const firstName =
-    typeof data.body.firstName === "string" &&
-    data.body.firstName.trim().length > 0
-      ? data.body.firstName.trim()
+    typeof req.body.firstName === "string" &&
+    req.body.firstName.trim().length > 0
+      ? req.body.firstName.trim()
       : false;
 
   const lastName =
-    typeof data.body.lastName === "string" &&
-    data.body.lastName.trim().length > 0
-      ? data.body.lastName.trim()
+    typeof req.body.lastName === "string" && req.body.lastName.trim().length > 0
+      ? req.body.lastName.trim()
       : false;
 
   const password =
-    typeof data.body.password === "string" &&
-    data.body.password.trim().length > 0
-      ? data.body.password.trim()
+    typeof req.body.password === "string" && req.body.password.trim().length > 0
+      ? req.body.password.trim()
       : false;
 
   // Error if email is invalid
@@ -155,7 +156,7 @@ handlers._customers.put = function (data, callback) {
     if (firstName || lastName || password) {
       // Get token from headers
       const token =
-        typeof data.headers.token === "string" ? data.headers.token : false;
+        typeof req.headers.token === "string" ? req.headers.token : false;
 
       // Verify that the given token is valid for the email number
       handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
@@ -203,18 +204,17 @@ handlers._customers.put = function (data, callback) {
 
 // Required data: email
 // Cleanup old checks associated with the user
-handlers._customers.delete = function (data, callback) {
+handlers._customers.delete = function (req, callback) {
   // Check that email number is valid
   const email =
-    typeof data.query.email === "string" &&
-    data.query.email.trim().length === 10
-      ? data.query.email.trim()
+    typeof req.query.email === "string" && req.query.email.trim().length === 10
+      ? req.query.email.trim()
       : false;
 
   if (email) {
     // Get token from headers
     const token =
-      typeof data.headers.token === "string" ? data.headers.token : false;
+      typeof req.headers.token === "string" ? req.headers.token : false;
 
     // Verify that the given token is valid for the email number
     handlers._tokens.verifyToken(token, email, function (tokenIsValid) {

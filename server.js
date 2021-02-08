@@ -6,14 +6,11 @@
 // Dependencies node
 const http = require("http");
 const https = require("https");
-const url = require("url");
-const StringDecoder = require("string_decoder").StringDecoder;
 const fs = require("fs");
 const path = require("path");
 
 // Dependencies lib
 const config = require("./config");
-const handlers = require("./handlers");
 const helpers = require("./helpers");
 
 // Instantiate the server module object
@@ -38,85 +35,33 @@ server.httpsServer = https.createServer(
 );
 
 // All the server logic for both the http and https server
-server.unifiedServer = function (req, res) {
-  // Parse the url
-  const parsedUrl = url.parse(req.url, true);
+server.unifiedServer = async function (req, res) {
+  const modules = require("./modules");
+  const handlers = await modules();
 
-  // Get the path
-  const path = parsedUrl.pathname;
-  const trimmedPath = path.replace(/^\/+|\/+$/g, "");
+  const App = require("./classes/App");
+  const app = new App(req, res);
 
-  // Get the query string as an object
-  const query = parsedUrl.query;
+  // Define app modules
+  app.setModules(handlers);
 
-  // Get the HTTP method
-  const method = req.method.toLowerCase();
+  // Parse Body
+  const body = await app.request.parseBody(req);
+  app.request.setBody(body);
 
-  //Get the headers as an object
-  const headers = req.headers;
+  // @TODO: define an order and check if a payload or status code is defined
+  // Run authentication
+  app.middlewares.authentication(app);
 
-  // Get the payload,if any
-  const decoder = new StringDecoder("utf-8");
-  let buffer = "";
+  // Run middlewares
+  app.middlewares.controller(app);
 
-  req.on("data", function (data) {
-    buffer += decoder.write(data);
-  });
-
-  req.on("end", async function () {
-    buffer += decoder.end();
-
-    const router = await server.router;
-
-    // Check the router for a matching path for a handler. If one is not found, use the notFound handler instead.
-    const chosenHandler =
-      typeof router[trimmedPath] !== "undefined"
-        ? router[trimmedPath]
-        : router.notFound;
-
-    // Construct the data object to send to the handler
-    const request = {
-      trimmedPath: trimmedPath,
-      query,
-      method,
-      headers,
-      body: helpers.tools.parseJsonToObject(buffer),
-    };
-
-    // Route the request to the handler specified in the router
-    chosenHandler(request, function (statusCode, payload) {
-      // Use the status code returned from the handler, or set the default status code to 200
-      statusCode = typeof statusCode === "number" ? statusCode : 200;
-
-      // Use the payload returned from the handler, or set the default payload to an empty object
-      payload = typeof payload === "object" ? payload : {};
-
-      // Convert the payload to a string
-      const payloadString = JSON.stringify(payload);
-
-      // Return the response
-      res.setHeader("Content-Type", "application/json");
-      res.writeHead(statusCode);
-      res.end(payloadString);
-
-      // If the response is 200, print green, otherwise print red
-      if (statusCode === 200) {
-        helpers.log.debug(
-          "server",
-          method.toUpperCase() + " /" + trimmedPath + " " + statusCode
-        );
-      } else {
-        helpers.log.debug(
-          "server",
-          method.toUpperCase() + " /" + trimmedPath + " " + statusCode
-        );
-      }
-    });
-  });
+  // Run end
+  app.middlewares.response(app);
 };
 
 // Define the request router
-server.router = handlers;
+// server.router = handlers;
 
 // Init script
 server.init = function () {

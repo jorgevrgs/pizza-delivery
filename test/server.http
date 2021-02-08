@@ -1,18 +1,33 @@
 ### NOT FOUND
-GET https://localhost:3001/ping?foo=bar
+POST https://localhost:3001/ping?foo=bar
 
+{
+  "foo": "bar"
+}
 
 ### GET
 GET https://localhost:3001/customers
 
 
-### POST
+### POST /tokens
+POST https://localhost:3001/tokens
+
+{
+  "email": "user9@example.com",
+  "password": "abcd123"
+}
+
+### POST /customers
 POST https://localhost:3001/customers
 
 {
   "firstName": "John",
   "lastName": "Doe",
-  "email": "user3@example.com",
+  "email": "user10@example.com",
   "password": "abcd123",
   "tosAgreement": true
 }
+
+### GET /customers
+GET https://localhost:3001/customers?id=aaa4fd32ec9f3be7a47948d1953d31f9908b0f620da6e6fcfb99115e924923ab
+token: 1b68e69f79d894dfdbe6ecada104f133
