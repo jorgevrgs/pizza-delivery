@@ -1,6 +1,6 @@
 ### COSNT
 @userId=9c5b3267c83d7c2e7f6832599e9cb22d913846b19782dac4f057da886f6a0993
-@tokenId=cfd0b3de42a7f3642b860b3995ae3e87
+@tokenId=9c5b3267c83d7c2e7f6832599e9cb22d913846b19782dac4f057da886f6a0993.8df84374af8dd3101420907f87f95654.e640494227ca3d1e9d95dfc88fae7c11db57600ccaf502f004015906071e49e3
 
 
 ### NOT FOUND
@@ -35,4 +35,4 @@ POST https://localhost:3001/customers
 
 ### GET /customers
 GET https://localhost:3001/customers?id={{userId}}
-token: {{userId}}.{{tokenId}}
+token: {{tokenId}}

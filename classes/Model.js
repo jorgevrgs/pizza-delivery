@@ -72,7 +72,7 @@ module.exports = class Model {
     }
   }
 
-  async findOne(id, clean = false) {
+  async findOne(id, clean = true) {
     try {
       const data = await _data.read(this.plural, id);
 

@@ -56,7 +56,10 @@ methods.post = async function (req, res) {
             expires: Date.now() + 1000 * 60 * 60,
           });
 
-          res.send(tokenObject);
+          let tokenString = `${user.id}.${tokenObject.id}.`;
+          tokenString += helpers.password.hash(tokenString);
+
+          res.send({ token: tokenString });
         } else {
           res.sendStatus(401);
         }

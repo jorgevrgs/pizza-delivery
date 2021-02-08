@@ -23,11 +23,12 @@ module.exports = async function (app) {
   if (token) {
     const tokenArray = token.split(".");
 
-    if (tokenArray.length === 2) {
+    if (tokenArray.length === 3) {
       const userId = tokenArray[0];
       const tokenId = tokenArray[1];
 
-      if (tokenId && userId) {
+      const localSignature = app.helpers.password.hash(`${userId}.${tokenId}.`);
+      if (localSignature === tokenArray[2] && tokenId && userId) {
         if (await app.helpers.validate.verifyToken(tokenId, userId)) {
           app.request.userId = userId;
         }
