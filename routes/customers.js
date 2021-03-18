@@ -111,12 +111,7 @@ methods.get = async function (req, res) {
     const id = typeof req.query.id === "string" ? req.query.id.trim() : false;
 
     if (id) {
-      // Get token from headers
-      const token =
-        typeof req.headers.token === "string" ? req.headers.token : false;
-
-      console.log(req.userId);
-
+      // User is authenticated
       if (req.userId && id === req.userId) {
         const user = await User.findOne(id);
 

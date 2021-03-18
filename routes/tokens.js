@@ -77,24 +77,35 @@ methods.post = async function (req, res) {
 // Tokens - get
 // Required data: id
 // Optional data: none
-methods.get = function (data, callback) {
-  // Check that id is valid
-  const id =
-    typeof data.queryStringObject.id === "string" &&
-    data.queryStringObject.id.trim().length === 20
-      ? data.queryStringObject.id.trim()
-      : false;
-  if (id) {
-    // Lookup the token
-    _data.read("tokens", id, function (err, tokenData) {
-      if (!err && tokenData) {
-        callback(200, tokenData);
+methods.get = async function (req, res) {
+  try {
+    const token =
+      typeof req.query.id === "string" ? req.query.id.trim() : false;
+
+    if (token) {
+      // Extract the token Id from the token query string
+      const tokenArray = token.split(".");
+      const tokenId = tokenArray[1];
+
+      if (tokenId) {
+        // Find token data from database
+        const response = await Token.findOne(tokenId);
+
+        if (response) {
+          res.send(response);
+        } else {
+          res.sendStatus(404);
+        }
       } else {
-        callback(404);
+        res.sendStatus(400);
       }
-    });
-  } else {
-    callback(400, { Error: "Missing required field, or field invalid" });
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (error) {
+    res.sendStatus(500);
+  } finally {
+    return { req, res };
   }
 };
 
@@ -175,21 +186,4 @@ methods.delete = function (data, callback) {
   } else {
     callback(400, { Error: "Missing required field" });
   }
-};
-
-// Verify if a given token id is currently valid for a given user
-methods.verifyToken = async function (id, email) {
-  return new Promise((resolve) => {
-    try {
-      const tokenData = _data.read("tokens", id);
-      // Check that the token is for the given user and has not expired
-      if (tokenData.email === email && tokenData.expires > Date.now()) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    } catch (error) {
-      resolve(false);
-    }
-  });
 };
