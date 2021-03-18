@@ -1,6 +1,6 @@
 ### COSNT
-@userId=4cc4abe59a5ea8a63edded1771be6a78a4badf20ae89a6bad732d6ab7b48035c
-@tokenId=4cc4abe59a5ea8a63edded1771be6a78a4badf20ae89a6bad732d6ab7b48035c.5897805f7448eb87bd1be40166bc6f7d.4e0ac7a72b07d4cb4594f57ad9eb6719b6aa9f467a7d192dc1ec8784d29342d7
+@userId=ef15c030aaadaab90e9773a2f9e3cc5596515f26424d664fd3b5f1dfc74759d0
+@tokenId=ef15c030aaadaab90e9773a2f9e3cc5596515f26424d664fd3b5f1dfc74759d0.0b60559c9b4761023aa5523d1a8fb9cb.8ba41af6ae37af4277ea934ba1f65795e66d96a1d9ad17963d48bc0acf0526d5
 
 
 ### NOT FOUND
@@ -15,11 +15,16 @@ GET https://localhost:3001/customers?id={{userId}}
 token: {{tokenId}}
 
 
+### DELETE
+DELETE https://localhost:3001/customers?id={{userId}}
+token: {{tokenId}}
+
+
 ### POST /tokens
 POST https://localhost:3001/tokens
 
 {
-  "email": "user11@example.com",
+  "email": "user8@example.com",
   "password": "abcd123"
 }
 

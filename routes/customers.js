@@ -115,6 +115,8 @@ methods.get = async function (req, res) {
       const token =
         typeof req.headers.token === "string" ? req.headers.token : false;
 
+      console.log(req.userId);
+
       if (req.userId && id === req.userId) {
         const user = await User.findOne(id);
 
@@ -210,4 +212,21 @@ methods.put = async function (req, res) {
 
 // Required data: email
 // Cleanup old checks associated with the user
-methods.delete = function (req, res) {};
+methods.delete = async function (req, res) {
+  // Check that email number is valid
+  const id = typeof req.query.id === "string" ? req.query.id.trim() : false;
+
+  if (id) {
+    if (req.userId && id === req.userId) {
+      await User.destroyOne({ id });
+
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(403);
+    }
+  } else {
+    res.sendStatus(400);
+  }
+
+  return { req, res };
+};
