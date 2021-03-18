@@ -1,6 +1,7 @@
 module.exports = async function (app) {
+  const { Route } = app.classes;
   // Load routes
-  const route = new app.Route(app.request.trimmedPath);
+  const route = new Route(app.request.trimmedPath);
   route.setRoutes(app.routes);
 
   // Load handler

@@ -4,8 +4,6 @@ const helpers = require("../helpers");
 
 module.exports = class Request {
   constructor(req) {
-    // @TODO: prototype
-
     // Get the HTTP method
     this.method = req.method.toLowerCase();
 

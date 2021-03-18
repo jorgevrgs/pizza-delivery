@@ -49,17 +49,7 @@ server.unifiedServer = async function (req, res) {
   const body = await app.request.parseBody(req);
   app.request.setBody(body);
 
-  helpers.log.info(`${req.method} ${req.url}`);
-
-  // @TODO: define an order and check if a payload or status code is defined
-  // Run authentication
-  app.use(await app.middlewares.authentication(app));
-
-  // Run middlewares
-  app.use(await app.middlewares.controller(app));
-
-  // Run end
-  app.use(app.middlewares.response(app));
+  app.process();
 };
 
 // Define the request router

@@ -126,6 +126,8 @@ methods.get = async function (req, res) {
       } else {
         res.sendStatus(403);
       }
+    } else {
+      res.sendStatus(400);
     }
   } catch (error) {
     helpers.log.error(error);
@@ -208,4 +210,4 @@ methods.put = async function (req, res) {
 
 // Required data: email
 // Cleanup old checks associated with the user
-methods.delete = function (req, callback) {};
+methods.delete = function (req, res) {};

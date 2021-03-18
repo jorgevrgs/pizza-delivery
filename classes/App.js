@@ -3,25 +3,13 @@ module.exports = class App {
     this.req = req;
     this.res = res;
 
+    this.classes = {};
     this.helpers = {};
     this.middlewares = {};
     this.models = {};
+    this.request = {};
+    this.response = {};
     this.routes = {};
-
-    /**
-     * @param {class} Model
-     */
-    this.Model = {};
-
-    /**
-     * @param {class} Request
-     */
-    this.Request = {};
-
-    /**
-     * @param {class} Response
-     */
-    this.Response = {};
   }
 
   /**
@@ -30,16 +18,19 @@ module.exports = class App {
    */
   setModules(modules) {
     Object.assign(this, modules);
+    const { Request, Response } = modules.classes;
 
-    this.request = new this.Request(this.req);
-    this.response = new this.Response(this.res);
+    this.request = new Request(this.req);
+    this.response = new Response(this.res);
   }
 
-  /**
-   *
-   * @param {App} app
-   */
-  use(app) {
-    Object.assign(this, app);
+  async process() {
+    this.helpers.log.info(`${this.req.method} ${this.req.url}`);
+
+    const { authentication, controller, response } = this.middlewares;
+
+    Object.assign(this, await authentication(this));
+    Object.assign(this, await controller(this));
+    Object.assign(this, await response(this));
   }
 };

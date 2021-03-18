@@ -10,22 +10,10 @@ const helpers = require("../helpers");
 module.exports = function () {
   return new Promise(async (resolve, reject) => {
     try {
-      const modules = ["helpers", "models", "middlewares", "routes"];
+      const modules = ["classes", "helpers", "models", "middlewares", "routes"];
       const result = await helpers.files.loadModules(modules);
 
-      // Classes
-      const Model = require("../classes/Model");
-      const Request = require("../classes/Request");
-      const Response = require("../classes/Response");
-      const Route = require("../classes/Route");
-
-      resolve({
-        ...result,
-        Model,
-        Request,
-        Response,
-        Route,
-      });
+      resolve(result);
     } catch (error) {
       reject(error);
     }
