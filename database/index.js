@@ -9,12 +9,9 @@ const path = require("path");
 const helpers = require("../helpers");
 const util = require("util");
 
-const open = util.promisify(fs.open);
-const writeFile = util.promisify(fs.writeFile);
+const open = fs.promises.open;
 const readFile = util.promisify(fs.readFile);
-const truncate = util.promisify(fs.truncate);
 const readdir = util.promisify(fs.readdir);
-const close = util.promisify(fs.close);
 
 // Container for module (to be exported)
 let lib = {};
@@ -29,17 +26,15 @@ lib.create = function (dir, file, data) {
       // Open the file for writing
       // "w" Open file for writing. The file is created (if it does not exist) or truncated (if it exists).
       // "wx" Like 'w' but fails if the path exists.
-      const fileDescriptor = await open(
+      const filehandle = await open(
         path.join(lib.baseDir, dir, `${file}.json`),
         "wx"
       );
 
       // Convert data to string
       let stringData = JSON.stringify(data);
-
-      await writeFile(fileDescriptor, stringData);
-
-      await close(fileDescriptor);
+      filehandle.writeFile(stringData);
+      filehandle.close();
 
       const readed = await lib.read(dir, file);
 
@@ -76,7 +71,7 @@ lib.update = function (dir, file, data) {
     try {
       // Open the file for writing
       // "r+" Open file for reading and writing. An exception occurs if the file does not exist.
-      const fileDescriptor = await open(
+      const filehandle = await open(
         path.join(lib.baseDir, dir, `${file}.json`),
         "r+"
       );
@@ -84,9 +79,9 @@ lib.update = function (dir, file, data) {
       // Convert data to string
       let stringData = JSON.stringify(data);
 
-      await truncate(fileDescriptor);
-      await writeFile(fileDescriptor, stringData);
-      await close(fileDescriptor);
+      filehandle.truncate();
+      filehandle.writeFile(stringData);
+      filehandle.close();
 
       resolve(true);
     } catch (error) {

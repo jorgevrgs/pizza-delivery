@@ -7,5 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jorge Vargas <jorgevargasla@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  }
 }
