@@ -233,31 +233,26 @@ workers.processCheckOutcome = async function (originalCheckData, checkOutcome) {
 };
 
 // Alert the user as to a change in their check status
-workers.alertUserToStatusChange = function (newCheckData) {
-  const msg =
-    "Alert: Your check for " +
-    newCheckData.method.toUpperCase() +
-    " " +
-    newCheckData.protocol +
-    "://" +
-    newCheckData.url +
-    " is currently " +
-    newCheckData.state;
-  helpers.service.sendTwilioSms(newCheckData.userPhone, msg, function (err) {
-    if (!err) {
-      helpers.log.debug(
-        "workers",
-        "Success: User was alerted to a status change in their check, via sms: ",
-        msg
-      );
-    } else {
-      helpers.log.debug(
-        "workers",
-        "Error: Could not send sms alert to user who had a state change in their check",
-        err
-      );
-    }
-  });
+workers.alertUserToStatusChange = async function (newCheckData) {
+  const msg = `Alert: Your check for ${newCheckData.method.toUpperCase()} ${
+    newCheckData.protocol
+  }://${newCheckData.url} is currently ${newCheckData.state}`;
+
+  try {
+    await helpers.service.sendTwilioSms(newCheckData.userPhone, msg);
+
+    helpers.log.debug(
+      "workers",
+      "Success: User was alerted to a status change in their check, via sms: ",
+      msg
+    );
+  } catch (error) {
+    helpers.log.debug(
+      "workers",
+      "Error: Could not send sms alert to user who had a state change in their check",
+      err
+    );
+  }
 };
 
 // Send check data to a log file
