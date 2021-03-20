@@ -99,7 +99,7 @@ module.exports = class Model {
 
       await _db.create(this.plural, id, obj);
 
-      let response = await _db.read(this.plural, id);
+      let response = await this.findOne(id);
 
       if (clean) {
         response = this.clean(response);
@@ -117,7 +117,9 @@ module.exports = class Model {
     try {
       await _db.update(this.plural, id, data);
 
-      return await this.findOne(id);
+      const response = await this.findOne(id);
+
+      return response;
     } catch (error) {
       helpers.log.error(error);
       throw new Error(error.message);

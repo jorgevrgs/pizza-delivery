@@ -36,9 +36,7 @@ lib.create = function (dir, file, data) {
       filehandle.writeFile(stringData);
       filehandle.close();
 
-      const readed = await lib.read(dir, file);
-
-      resolve(readed);
+      resolve(true);
     } catch (error) {
       helpers.log.error("error.lib.create", { dir, file, data });
       helpers.log.error(util.inspect(error));
@@ -59,7 +57,7 @@ lib.read = function (dir, file) {
 
       resolve(parsedData);
     } catch (error) {
-      helpers.log.error("error.lib.read", { dir, file });
+      helpers.log.verbose("error.lib.read", { dir, file });
       resolve(false);
     }
   });
