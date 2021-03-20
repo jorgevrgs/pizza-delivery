@@ -34,7 +34,7 @@ POST https://localhost:3001/customers
 {
   "firstName": "John",
   "lastName": "Doe",
-  "email": "user1@example.com",
+  "email": "user16@example.com",
   "password": "abcd1234...",
   "tosAgreement": true
 }
@@ -44,7 +44,7 @@ GET https://localhost:3001/tokens?id={{tokenId}}
 
 ### PUT /customers
 PUT https://localhost:3001/customers
-token: {{tokenId}}
+Authorization: Bearer {{tokenId}}
 
 {
   "email": "user10@example.com",
