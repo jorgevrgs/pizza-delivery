@@ -1,6 +1,6 @@
 ### COSNT
-@userId=1e6e5145f3182ea59ea72b7941f9fb59047efaab48024fa44ebc110323dd0d5e
-@tokenId=user9@example.com.d2aaa72a32e2ab758dfbf7ff170db66c.3b9f4014e962423ae1dd46334c94e87150dd8bd79069bbf8ca79d33121dd74b0
+@userId=7f1ffad9787995a14ba79f26643fe32485de882edef63e952141185eff26ccb9
+@tokenId=7f1ffad9787995a14ba79f26643fe32485de882edef63e952141185eff26ccb9.072d67c789da65590fab0a3af411a0d7.a6eb240cf5bb02d173b21cefb274907da1465640bc88eb220a4b8d1c147c9088
 
 
 ### NOT FOUND
@@ -12,20 +12,20 @@ POST https://localhost:3001/ping?foo=bar
 
 ### GET
 GET https://localhost:3001/customers?id={{userId}}
-token: {{tokenId}}
+Authorization: Bearer {{tokenId}}
 
 
 ### DELETE
 DELETE https://localhost:3001/customers?id={{userId}}
-token: {{tokenId}}
+Authorization: Bearer {{tokenId}}
 
 
 ### POST /tokens
 POST https://localhost:3001/tokens
 
 {
-  "email": "user9@example.com",
-  "password": "abcd123"
+  "email": "user16@example.com",
+  "password": "abcd1234..."
 }
 
 ### POST /customers
@@ -34,7 +34,7 @@ POST https://localhost:3001/customers
 {
   "firstName": "John",
   "lastName": "Doe",
-  "email": "user16@example.com",
+  "email": "user17@example.com",
   "password": "abcd1234...",
   "tosAgreement": true
 }
