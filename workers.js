@@ -4,14 +4,13 @@
  */
 
 // Dependencies node
-const _data = require("./data");
 const https = require("https");
 const http = require("http");
 const url = require("url");
 
 // Dependencies lib
 const helpers = require("./helpers");
-const _logs = require("./logs");
+const _db = require("./database");
 
 // Instantiate the worker module object
 let workers = {};
@@ -20,10 +19,10 @@ let workers = {};
 workers.gatherAllChecks = async function () {
   // Get all the checks
   try {
-    const checks = await _data.list("checks");
+    const checks = await _db.list("checks");
 
     checks.forEach(async (check) => {
-      const originalCheckData = await _data.read("checks", check);
+      const originalCheckData = await _db.read("checks", check);
 
       // Pass it to the check validator, and let that function continue the function or log the error(s) as needed
       workers.validateCheckData(originalCheckData);
@@ -219,7 +218,7 @@ workers.processCheckOutcome = async function (originalCheckData, checkOutcome) {
 
   // Save the updates
   try {
-    await _data.update("checks", newCheckData.id, newCheckData);
+    await _db.update("checks", newCheckData.id, newCheckData);
 
     if (alertWarranted) {
       workers.alertUserToStatusChange(newCheckData);
@@ -286,7 +285,7 @@ workers.log = function (
   const logFileName = originalCheckData.id;
 
   // Append the log string to the file
-  _logs.append(logFileName, logString, function (err) {
+  helpers.logger.append(logFileName, logString, function (err) {
     if (!err) {
       helpers.log.debug("workers", "Logging to file succeeded");
     } else {
@@ -305,16 +304,16 @@ workers.loop = function () {
 // Rotate (compress) the log files
 workers.rotateLogs = function () {
   // List all the (non compressed) log files
-  _logs.list(false, function (err, logs) {
+  helpers.logger.list(false, function (err, logs) {
     if (!err && logs && logs.length > 0) {
       logs.forEach(function (logName) {
         // Compress the data to a different file
         const logId = logName.replace(".log", "");
         const newFileId = logId + "-" + Date.now();
-        _logs.compress(logId, newFileId, function (err) {
+        helpers.logger.compress(logId, newFileId, function (err) {
           if (!err) {
             // Truncate the log
-            _logs.truncate(logId, function (err) {
+            helpers.logger.truncate(logId, function (err) {
               if (!err) {
                 helpers.log.debug("workers", "Success truncating logfile");
               } else {

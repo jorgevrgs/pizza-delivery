@@ -46,7 +46,7 @@ methods.post = async function (req, res) {
 
     if (email && password) {
       // Lookup the user who matches that email number
-      const id = User.generateId({ email, password });
+      const id = User.getModelId({ email, password });
       const user = await User.findOne(id, false);
 
       if (user) {

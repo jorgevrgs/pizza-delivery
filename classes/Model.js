@@ -5,7 +5,7 @@ const Menu = require("../models/Menu");
 const Order = require("../models/Order");
 const Token = require("../models/Token");
 
-const _data = require("../data");
+const _db = require("../database");
 const helpers = require("../helpers");
 
 module.exports = class Model {
@@ -49,7 +49,7 @@ module.exports = class Model {
    *
    * @param {object} data Object to be stored in database
    */
-  generateId(data) {
+  getModelId(data) {
     if (typeof this.model.primaryKey !== "undefined") {
       if (data[this.model.primaryKey] !== "undefined") {
         return helpers.password.hash(data[this.model.primaryKey]);
@@ -63,7 +63,7 @@ module.exports = class Model {
 
   async find(criteria = {}) {
     try {
-      const data = await _data.list(this.plural, criteria);
+      const data = await _db.list(this.plural, criteria);
 
       return data;
     } catch (error) {
@@ -74,14 +74,15 @@ module.exports = class Model {
 
   async findOne(id, clean = true) {
     try {
-      const data = await _data.read(this.plural, id);
+      let data = await _db.read(this.plural, id);
 
       if (clean) {
-        return this.clean(data);
-      } else {
-        return data;
+        data = this.clean(data);
       }
+
+      return data;
     } catch (error) {
+      helpers.log.error("error.model.findOne", { id, clean });
       helpers.log.error(error);
       return false;
     }
@@ -89,23 +90,24 @@ module.exports = class Model {
 
   async create(data, clean = true) {
     try {
-      const id = this.generateId(data);
-      const obj = { id, ...data };
+      const id = this.getModelId(data);
+      const obj = { ...data, id };
 
       if (typeof this.model.beforeCreate === "function") {
         Object.assign(obj, this.model.beforeCreate(obj));
       }
 
-      await _data.create(this.plural, id, obj);
+      await _db.create(this.plural, id, obj);
 
-      let response = await _data.read(this.plural, id);
+      let response = await _db.read(this.plural, id);
 
       if (clean) {
-        return this.clean(response);
-      } else {
-        return response;
+        response = this.clean(response);
       }
+
+      return response;
     } catch (error) {
+      helpers.log.error("error.model.create", { data, clean });
       helpers.log.error(error);
       return false;
     }
@@ -113,7 +115,7 @@ module.exports = class Model {
 
   async update(id, data) {
     try {
-      await _data.update(this.plural, id, data);
+      await _db.update(this.plural, id, data);
 
       return await this.findOne(id);
     } catch (error) {
@@ -124,7 +126,7 @@ module.exports = class Model {
 
   async destroyOne({ id }) {
     try {
-      await _data.delete(this.plural, id);
+      await _db.delete(this.plural, id);
 
       return true;
     } catch (error) {

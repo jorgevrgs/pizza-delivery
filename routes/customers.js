@@ -79,7 +79,7 @@ methods.post = async function (req, res) {
         tosAgreement: true,
       };
 
-      const id = User.generateId(objToCreate);
+      const id = User.getModelId(objToCreate);
       const user = await User.findOne(id);
 
       if (user) {
@@ -173,7 +173,7 @@ methods.put = async function (req, res) {
         res.sendStatus(400);
       } else {
         // Lookup the user
-        const id = User.generateId({ email });
+        const id = User.getModelId({ email });
 
         const userData = await User.findOne(id);
 

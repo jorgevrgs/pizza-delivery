@@ -1,6 +1,6 @@
 ### COSNT
-@userId=ef15c030aaadaab90e9773a2f9e3cc5596515f26424d664fd3b5f1dfc74759d0
-@tokenId=ef15c030aaadaab90e9773a2f9e3cc5596515f26424d664fd3b5f1dfc74759d0.0b60559c9b4761023aa5523d1a8fb9cb.8ba41af6ae37af4277ea934ba1f65795e66d96a1d9ad17963d48bc0acf0526d5
+@userId=1e6e5145f3182ea59ea72b7941f9fb59047efaab48024fa44ebc110323dd0d5e
+@tokenId=user9@example.com.d2aaa72a32e2ab758dfbf7ff170db66c.3b9f4014e962423ae1dd46334c94e87150dd8bd79069bbf8ca79d33121dd74b0
 
 
 ### NOT FOUND
@@ -24,7 +24,7 @@ token: {{tokenId}}
 POST https://localhost:3001/tokens
 
 {
-  "email": "user8@example.com",
+  "email": "user9@example.com",
   "password": "abcd123"
 }
 
@@ -34,14 +34,13 @@ POST https://localhost:3001/customers
 {
   "firstName": "John",
   "lastName": "Doe",
-  "email": "user11@example.com",
-  "password": "abcd123",
+  "email": "user1@example.com",
+  "password": "abcd1234...",
   "tosAgreement": true
 }
 
-### GET /customers
-GET https://localhost:3001/customers?id={{userId}}
-token: {{tokenId}}
+### GET /tokens
+GET https://localhost:3001/tokens?id={{tokenId}}
 
 ### PUT /customers
 PUT https://localhost:3001/customers
