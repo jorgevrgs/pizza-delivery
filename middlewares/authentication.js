@@ -14,9 +14,10 @@
  */
 module.exports = async function (app) {
   // Get token from headers
+
   const token =
-    typeof app.request.headers.token === "string"
-      ? app.request.headers.token
+    typeof app.request.headers.authorization === "string"
+      ? app.request.headers.authorization.replace("Bearer ", "")
       : false;
 
   // Authorization token received, else proceed
