@@ -3,6 +3,9 @@
  */
 
 const https = require("https");
+const querystring = require("querystring");
+const request = require("./request");
+const config = require("../config");
 
 let services = {};
 
@@ -70,6 +73,36 @@ services.sendTwilioSms = function (phone, msg) {
       req.end();
     } else {
       reject("Given parameters were missing or invalid");
+    }
+  });
+};
+
+services.sendMailgunEmail = function ({ from = "", to, subject, text }) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const endpoint = "https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages".replace(
+        "YOUR_DOMAIN_NAME",
+        config.credentials.mailgun.domainName
+      );
+
+      const defaultFrom = `${config.credentials.mailgun.fromName} <${config.credentials.mailgun.from}>`;
+
+      const data = {
+        from: from || defaultFrom,
+        to,
+        subject,
+        text,
+      };
+
+      const options = {
+        auth: `api:${config.credentials.mailgun.apiKey}`,
+      };
+
+      const result = await request.post(endpoint, data, options);
+
+      resolve(result);
+    } catch (error) {
+      reject(error);
     }
   });
 };

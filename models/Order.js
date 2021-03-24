@@ -28,5 +28,24 @@ module.exports = {
       via: "order",
       example: "abcd1234",
     },
+    address: {
+      type: "object",
+      required: true,
+      example: {
+        street: "5th Av 1005",
+        city: "New York",
+        state: "NY",
+        phone: "+19876543212",
+      },
+    },
+    state: {
+      type: "string",
+      isIn: ["draft", "pending", "paid"],
+      default: "draft",
+    },
+    transactionId: {
+      type: "string",
+      default: "",
+    },
   },
 };
