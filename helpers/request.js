@@ -37,8 +37,8 @@ let helper = {};
 helper.get = function (endpoint, options = {}) {
   return new Promise(async (resolve, reject) => {
     try {
-      const url = new URL(endpoint, options);
-      const result = await request(url);
+      const url = new URL(endpoint);
+      const result = await request(url, options);
 
       resolve(result);
     } catch (error) {
