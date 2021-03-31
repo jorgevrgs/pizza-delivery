@@ -7,6 +7,7 @@ const password = require("./password");
 const tools = require("./tools");
 const log = require("./log");
 const logger = require("./logger");
+const request = require("./request");
 const service = require("./service");
 const files = require("./files");
 
@@ -15,6 +16,7 @@ module.exports = {
   tools,
   logger,
   log,
+  request,
   service,
   files,
 };
