@@ -52,7 +52,7 @@ module.exports = class Model {
   getModelId(data) {
     if (typeof this.model.primaryKey !== "undefined") {
       if (data[this.model.primaryKey] !== "undefined") {
-        return helpers.password.hash(data[this.model.primaryKey]);
+        return helpers.tools.utf8ToBase64(data[this.model.primaryKey]);
       } else {
         return false;
       }

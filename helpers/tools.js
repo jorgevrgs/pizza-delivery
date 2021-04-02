@@ -20,6 +20,10 @@ tools.parseJsonToObject = function (str) {
   }
 };
 
+tools.utf8ToBase64 = function (from) {
+  return Buffer.from(from, "utf8").toString("base64");
+};
+
 /**
  * Create a string of random alphanumeric characters, of a given length
  *
