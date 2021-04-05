@@ -13,12 +13,12 @@ const tools = require("./tools");
 const validate = require("./validate");
 
 module.exports = {
-  password,
-  tools,
-  logger,
+  files,
   log,
+  logger,
+  tools,
+  password,
   request,
   service,
-  files,
   validate,
 };

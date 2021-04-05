@@ -4,6 +4,7 @@
  */
 
 // Dependencies
+const bootstrap = require("./bootstrap");
 const server = require("./server");
 const workers = require("./workers");
 
@@ -17,6 +18,9 @@ app.init = function () {
 
   // Start the workers
   workers.init();
+
+  // Bootstrap application
+  bootstrap.init();
 };
 
 // Self executing

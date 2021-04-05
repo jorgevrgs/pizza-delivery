@@ -1,0 +1,23 @@
+{
+  "menu": [
+    {"name": "The ULTIMATE Penguin", "ingredients": "Bacon, ham, meatball, sweet sausage, roasted potato, hot cherry peppers, caramelized onions", "price": 21},
+    {"name": "The Lexi Rae", "ingredients": "Homemade tomato sauce, house made cheese blend, pepperoni, green peppers, red onions", "price": 16},
+    {"name": "Plain Cheese", "ingredients": "Traditional cheese pizza with basil, tomato sauce, & mozzarella cheese blend", "price": 12},
+    {"name": "The Pepperoni", "ingredients": "Homemade tomato sauce, our house cheese blend, loaded with pepperoni", "price": 14},
+    {"name": "The Blanco", "ingredients": "Basil pesto sauce, roasted garlic, fresh mozzarella", "price": 14},
+    {"name": "The Aegean", "ingredients": "Housemade tomato sauce, mozzarella cheese blend, spinach, sliced tomato, kalamata olives, feta", "price": 14},
+    {"name": "The Bolognese", "ingredients": "Traditional Bolognese meat sauce, portabella mushrooms, tomato sauce, mozzarella cheese blend", "price": 15},
+    {"name": "The Honolulu", "ingredients": "Fresh pineapple, bacon, caramelized onions, tomato sauce", "price": 16},
+    {"name": "The Fungus Amongus", "ingredients": "Wild mushroom blend, creamy mashed potato, roasted garlic, truffle oil", "price": 15},
+    {"name": "The Diablo", "ingredients": "Hot Italian sausage, spicy tomato sauce, hot cherry peppers, red onions, green peppers", "price": 16},
+    {"name": "The Veggie Pie", "ingredients": "Roasted red peppers, red onions, broccoli, mushrooms, tomato sauce", "price": 15},
+    {"name": "The Bird", "ingredients": "BBQ sauce, BBQ roasted chicken, caramelized onions", "price": 15},
+    {"name": "The Neopolitan", "ingredients": "Tomato sauce, fresh mozzarella, tomatoes, basil", "price": 15},
+    {"name": "Buffalo Bleu", "ingredients": "Buffalo fried chicken, blue cheese crumble, ranch, celery", "price": 15},
+    {"name": "Tuscan Fig & Prosciutto", "ingredients": "Preserved fig jam, goat cheese, sliced prosciutto, caramelized onions.", "price": 17},
+    {"name": "The Roasted Eggplant", "ingredients": "Roasted eggplant, ricotta cheese, fresh basil, balsamic glaze", "price": 15},
+    {"name": "The Butternut Squash", "ingredients": "Butternut squash purée, goat cheese, braised leeks, fried sage", "price": 15},
+    {"name": "The Chicken & Broccoli", "ingredients": "Roast chicken, broccoli, alfredo sauce, parmesan, & mozzarella", "price": 15},
+    {"name": "The Pat", "ingredients": "Sweet sausage, green peppers, onions, Parmesan, chili flakes", "price": 16}
+  ]
+}

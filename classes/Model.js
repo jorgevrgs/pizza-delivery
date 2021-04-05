@@ -1,5 +1,4 @@
 const Customer = require("../models/Customer");
-const Food = require("../models/Food");
 const Item = require("../models/Item");
 const Menu = require("../models/Menu");
 const Order = require("../models/Order");
@@ -18,9 +17,6 @@ module.exports = class Model {
     switch (model.trim().toString()) {
       case "customer":
         this.model = Customer;
-        break;
-      case "food":
-        this.model = Food;
         break;
       case "item":
         this.model = Item;
@@ -85,6 +81,23 @@ module.exports = class Model {
     }
   }
 
+  async createEach(params) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let toCreatePromises = [];
+        for (let param of params) {
+          toCreatePromises.push(this.create(param));
+        }
+
+        await Promise.all(toCreatePromises);
+
+        resolve(true);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
   async create(data, cleanBeforeResponse = true) {
     try {
       const id = this.getModelId(data);
@@ -104,6 +117,7 @@ module.exports = class Model {
 
       return response;
     } catch (error) {
+      console.log(helpers.log);
       helpers.log.error("error.model.create", { data, cleanBeforeResponse });
       helpers.log.error(error);
       return false;
