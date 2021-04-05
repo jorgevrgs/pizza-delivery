@@ -9,7 +9,8 @@
  */
 
 module.exports = {
-  attributtes: {
+  tableName: "orders",
+  attributes: {
     date: {
       type: "string",
       required: true,
@@ -32,10 +33,18 @@ module.exports = {
       type: "object",
       required: true,
       example: {
-        street: "5th Av 1005",
+        street: "5th Av 123 NW",
         city: "New York",
         state: "NY",
-        phone: "+19876543212",
+        country: "US",
+      },
+      validate: (address) => {
+        return (
+          address.street != null &&
+          address.city != null &&
+          address.state != null &&
+          address.country != null
+        );
       },
     },
     state: {

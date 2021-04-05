@@ -3,13 +3,14 @@
  */
 
 // Dependencies
-const password = require("./password");
-const tools = require("./tools");
+const files = require("./files");
 const log = require("./log");
 const logger = require("./logger");
+const password = require("./password");
 const request = require("./request");
 const service = require("./service");
-const files = require("./files");
+const tools = require("./tools");
+const validate = require("./validate");
 
 module.exports = {
   password,
@@ -19,4 +20,5 @@ module.exports = {
   request,
   service,
   files,
+  validate,
 };

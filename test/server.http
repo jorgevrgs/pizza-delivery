@@ -24,7 +24,7 @@ Authorization: Bearer {{tokenId}}
 POST https://localhost:3001/tokens
 
 {
-  "email": "user16@example.com",
+  "email": "user02@example.com",
   "password": "abcd1234..."
 }
 
@@ -34,7 +34,7 @@ POST https://localhost:3001/customers
 {
   "firstName": "John",
   "lastName": "Doe",
-  "email": "user17@example.com",
+  "email": "user03@example.com",
   "password": "abcd1234...",
   "tosAgreement": true
 }

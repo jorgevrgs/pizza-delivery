@@ -1,5 +1,6 @@
 module.exports = {
-  attributtes: {
+  tableName: "menus",
+  attributes: {
     name: {
       type: "string",
       required: true,

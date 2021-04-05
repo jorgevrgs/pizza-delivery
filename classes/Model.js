@@ -18,31 +18,28 @@ module.exports = class Model {
     switch (model.trim().toString()) {
       case "customer":
         this.model = Customer;
-        this.plural = "customers";
         break;
       case "food":
         this.model = Food;
-        this.plural = "foods";
         break;
       case "item":
         this.model = Item;
-        this.plural = "items";
         break;
       case "menu":
         this.model = Menu;
-        this.plural = "menus";
         break;
       case "token":
         this.model = Token;
-        this.plural = "tokens";
         break;
       case "order":
         this.model = Order;
-        this.plural = "orders";
         break;
       default:
         throw new Error("An invalid model name was received");
     }
+
+    this.tableName = this.model.tableName;
+    this.attributes = this.model.attributes;
   }
 
   /**
@@ -63,7 +60,7 @@ module.exports = class Model {
 
   async find(criteria = {}) {
     try {
-      const data = await _db.list(this.plural, criteria);
+      const data = await _db.list(this.tableName, criteria);
 
       return data;
     } catch (error) {
@@ -72,23 +69,23 @@ module.exports = class Model {
     }
   }
 
-  async findOne(id, clean = true) {
+  async findOne(id, cleanBeforeResponse = true) {
     try {
-      let data = await _db.read(this.plural, id);
+      let data = await _db.read(this.tableName, id);
 
-      if (clean) {
-        data = this.clean(data);
+      if (cleanBeforeResponse) {
+        data = this.cleanBeforeResponse(data);
       }
 
       return data;
     } catch (error) {
-      helpers.log.error("error.model.findOne", { id, clean });
+      helpers.log.error("error.model.findOne", { id, cleanBeforeResponse });
       helpers.log.error(error);
       return false;
     }
   }
 
-  async create(data, clean = true) {
+  async create(data, cleanBeforeResponse = true) {
     try {
       const id = this.getModelId(data);
       const obj = { ...data, id };
@@ -97,17 +94,17 @@ module.exports = class Model {
         Object.assign(obj, this.model.beforeCreate(obj));
       }
 
-      await _db.create(this.plural, id, obj);
+      await _db.create(this.tableName, id, obj);
 
       let response = await this.findOne(id);
 
-      if (clean) {
-        response = this.clean(response);
+      if (cleanBeforeResponse) {
+        response = this.cleanBeforeResponse(response);
       }
 
       return response;
     } catch (error) {
-      helpers.log.error("error.model.create", { data, clean });
+      helpers.log.error("error.model.create", { data, cleanBeforeResponse });
       helpers.log.error(error);
       return false;
     }
@@ -115,7 +112,7 @@ module.exports = class Model {
 
   async update(id, data) {
     try {
-      await _db.update(this.plural, id, data);
+      await _db.update(this.tableName, id, data);
 
       const response = await this.findOne(id);
 
@@ -128,7 +125,7 @@ module.exports = class Model {
 
   async destroyOne({ id }) {
     try {
-      await _db.delete(this.plural, id);
+      await _db.delete(this.tableName, id);
 
       return true;
     } catch (error) {
@@ -137,11 +134,41 @@ module.exports = class Model {
     }
   }
 
-  clean(response) {
+  cleanBeforeResponse(response) {
     if (typeof this.model.beforeResponse === "function") {
       Object.assign(response, this.model.beforeResponse(response));
     }
 
     return response;
+  }
+
+  hasMissingOrInvalidParams(body) {
+    const keys = Object.keys(this.attributes);
+
+    let missingOrInvalidFields = [];
+
+    keys.forEach((key) => {
+      // If it's required should be present
+      const fieldIsRequired =
+        typeof this.attributes[key].required !== "undefined" &&
+        true === this.attributes[key].required;
+
+      if (fieldIsRequired) {
+        // If it's required and it's validate function should be valid
+        const fieldRequireValidation =
+          typeof this.attributes[key].validate !== "undefined" &&
+          typeof this.attributes[key].validate === "function";
+
+        if (
+          (fieldRequireValidation &&
+            !this.attributes[key].validate(body[key])) ||
+          !body[key]
+        ) {
+          missingOrInvalidFields.push(key);
+        }
+      }
+    });
+
+    return missingOrInvalidFields;
   }
 };
