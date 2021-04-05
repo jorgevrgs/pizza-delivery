@@ -1,6 +1,6 @@
 ### COSNT
-@userId=7f1ffad9787995a14ba79f26643fe32485de882edef63e952141185eff26ccb9
-@tokenId=7f1ffad9787995a14ba79f26643fe32485de882edef63e952141185eff26ccb9.072d67c789da65590fab0a3af411a0d7.a6eb240cf5bb02d173b21cefb274907da1465640bc88eb220a4b8d1c147c9088
+@userId=dXNlcjAyQGV4YW1wbGUuY29t
+@tokenId=dXNlcjAyQGV4YW1wbGUuY29t.23450c65c828a5123fdcc1d19749162b.a65db29ad1789e57b1c836cbb303baa1873b7d657699ff43294a77c744326b57
 
 
 ### NOT FOUND
@@ -50,3 +50,8 @@ Authorization: Bearer {{tokenId}}
   "email": "user10@example.com",
   "firstName": "Johny"
 }
+
+
+### GET
+GET https://localhost:3001/menus
+Authorization: Bearer {{tokenId}}

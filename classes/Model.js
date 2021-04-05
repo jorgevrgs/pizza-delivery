@@ -56,7 +56,12 @@ module.exports = class Model {
 
   async find(criteria = {}) {
     try {
-      const data = await _db.list(this.tableName, criteria);
+      const ids = await _db.list(this.tableName, criteria);
+      let data = [];
+
+      for (let id of ids) {
+        data.push(await this.findOne(id));
+      }
 
       return data;
     } catch (error) {

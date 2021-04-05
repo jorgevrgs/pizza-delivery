@@ -83,6 +83,16 @@ Response:
 }
 ```
 
+### Get menu
+
+Request:
+
+```
+GET https://localhost:3001/menus
+Authorization: Bearer dXNlcjAyQGV4YW1wbGUuY29t.4cf6a2d2b514217c817d0a646745de1b.53186fffa16c1fc61f7d0ea64f0ffdd20070d1245ab585556e6c3a7934a9b899
+
+```
+
 ## Managing processes:
 
 ```
