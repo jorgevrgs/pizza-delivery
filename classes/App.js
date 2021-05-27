@@ -1,14 +1,18 @@
 module.exports = class App {
   constructor(req, res) {
-    this.req = req;
-    this.res = res;
+    this.raw = {
+      req,
+      res,
+    };
+
+    this.finished = false;
 
     this.classes = {};
     this.helpers = {};
     this.middlewares = {};
     this.models = {};
-    this.request = {};
-    this.response = {};
+    this.req = {};
+    this.res = {};
     this.routes = {};
   }
 
@@ -20,17 +24,17 @@ module.exports = class App {
     Object.assign(this, modules);
     const { Request, Response } = modules.classes;
 
-    this.request = new Request(this.req);
-    this.response = new Response(this.res);
+    this.req = new Request(this.raw);
+    this.res = new Response(this.raw);
   }
 
   async process() {
     this.helpers.log.info(`${this.req.method} ${this.req.url}`);
 
-    const { authentication, controller, response } = this.middlewares;
-
-    Object.assign(this, await authentication(this));
-    Object.assign(this, await controller(this));
-    Object.assign(this, await response(this));
+    for (let i of Object.keys(this.middlewares)) {
+      if (!this.finished) {
+        Object.assign(this, await this.middlewares[i](this));
+      }
+    }
   }
 };

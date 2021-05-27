@@ -1,9 +1,9 @@
 const StringDecoder = require("string_decoder").StringDecoder;
-const url = require("url");
+const { URL } = require("url");
 const helpers = require("../helpers");
 
 module.exports = class Request {
-  constructor(req) {
+  constructor({ req }) {
     // Get the HTTP method
     this.method = req.method.toLowerCase();
 
@@ -11,14 +11,24 @@ module.exports = class Request {
     this.headers = req.headers;
 
     // Parse the url
-    const parsedUrl = url.parse(req.url, true);
+    const parsedUrl = new URL(
+      [
+        "http",
+        req.connection.encrypted ? "s" : "",
+        "://",
+        req.headers.host,
+        req.url,
+      ].join("")
+    );
+
+    this.url = req.url;
 
     // Get the path
     const path = parsedUrl.pathname;
     this.trimmedPath = path.replace(/^\/+|\/+$/g, "");
 
     // Get the query string as an object
-    this.query = parsedUrl.query;
+    this.query = Object.fromEntries(parsedUrl.searchParams);
     this.body = {};
   }
 

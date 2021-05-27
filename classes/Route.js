@@ -12,6 +12,7 @@ module.exports = class Route {
         method: req.method,
         headers: req.headers,
         body: req.getBody(),
+        query: req.query,
       });
 
       return { req, res };

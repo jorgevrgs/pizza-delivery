@@ -4,6 +4,7 @@
   "description": "Pizza delivery API",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jorge Vargas <jorgevargasla@gmail.com>",

@@ -16,8 +16,8 @@ module.exports = async function (app) {
   // Get token from headers
 
   const token =
-    typeof app.request.headers.authorization === "string"
-      ? app.request.headers.authorization.replace("Bearer ", "")
+    typeof app.req.headers.authorization === "string"
+      ? app.req.headers.authorization.replace("Bearer ", "")
       : false;
 
   // Authorization token received, else proceed
@@ -31,7 +31,7 @@ module.exports = async function (app) {
       const localSignature = app.helpers.password.hash(`${userId}.${tokenId}.`);
       if (localSignature === tokenArray[2] && tokenId && userId) {
         if (await app.helpers.validate.verifyToken(tokenId, userId)) {
-          app.request.userId = userId;
+          app.req.userId = userId;
         }
       }
     }

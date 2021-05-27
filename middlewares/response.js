@@ -1,13 +1,13 @@
 module.exports = function (app) {
-  const res = app.res;
+  const { res } = app.raw;
 
-  app.response.json(app.response.getPayload());
+  app.res.json(app.res.getPayload());
 
-  for (let [key, value] of Object.entries(app.response.getHeaders())) {
+  for (let [key, value] of Object.entries(app.res.getHeaders())) {
     res.setHeader(key, value);
   }
-  res.writeHead(app.response.getStatusCode());
-  res.end(app.response.getBody());
+  res.writeHead(app.res.getStatusCode());
+  res.end(app.res.getBody());
 
   return app;
 };

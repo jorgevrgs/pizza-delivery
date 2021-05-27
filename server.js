@@ -46,8 +46,8 @@ server.unifiedServer = async function (req, res) {
   app.setModules(handlers);
 
   // Parse Body
-  const body = await app.request.parseBody(req);
-  app.request.setBody(body);
+  const body = await app.req.parseBody(req);
+  app.req.setBody(body);
 
   app.process();
 };
