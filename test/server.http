@@ -1,11 +1,6 @@
 ### COSNT
-<<<<<<< HEAD
-@userId=dXNlcjAxQGV4YW1wbGUuY29t
-@tokenId=dXNlcjAxQGV4YW1wbGUuY29t.3323e1bfada11f20bd9182b448fd1f70.face48c1c2bcd495f1fd4c5454e3cebd2eb65a8225ced259324f107a0efbc41f
-=======
 @userId=dXNlcjAyQGV4YW1wbGUuY29t
 @tokenId=dXNlcjAyQGV4YW1wbGUuY29t.23450c65c828a5123fdcc1d19749162b.a65db29ad1789e57b1c836cbb303baa1873b7d657699ff43294a77c744326b57
->>>>>>> 0a461896f5d2519b02a1286f151163b8e6037fe1
 
 
 ### NOT FOUND
@@ -29,11 +24,7 @@ Authorization: Bearer {{tokenId}}
 POST https://localhost:3001/tokens
 
 {
-<<<<<<< HEAD
-  "email": "user01@example.com",
-=======
   "email": "user02@example.com",
->>>>>>> 0a461896f5d2519b02a1286f151163b8e6037fe1
   "password": "abcd1234..."
 }
 
@@ -43,11 +34,7 @@ POST https://localhost:3001/customers
 {
   "firstName": "John",
   "lastName": "Doe",
-<<<<<<< HEAD
-  "email": "user01@example.com",
-=======
   "email": "user03@example.com",
->>>>>>> 0a461896f5d2519b02a1286f151163b8e6037fe1
   "password": "abcd1234...",
   "tosAgreement": true
 }
