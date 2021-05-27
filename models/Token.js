@@ -1,5 +1,6 @@
 module.exports = {
-  attributtes: {
+  tableName: "tokens",
+  attributes: {
     email: {
       type: "number",
       required: true,

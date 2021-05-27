@@ -5,6 +5,7 @@
 // Dependencies
 const helpers = require("../helpers");
 const Model = require("../classes/Model");
+const helper = require("../helpers/request");
 const User = new Model("customer");
 
 /**
@@ -23,6 +24,7 @@ module.exports = async function (req, res) {
       res.sendStatus(405);
     }
   } catch (error) {
+    helper.log.error(error);
     res.sendStatus(500);
   } finally {
     return { req, res };
@@ -38,46 +40,13 @@ let methods = {};
  * @param {Response} res
  */
 methods.post = async function (req, res) {
-  // @TODO: use a validator function
   // Check that all required fields are filled out
-  const firstName =
-    typeof req.body.firstName === "string" &&
-    req.body.firstName.trim().length > 0
-      ? req.body.firstName.trim()
-      : false;
+  const missingOrInvalidFields = User.hasMissingOrInvalidParams(req.body);
 
-  const lastName =
-    typeof req.body.lastName === "string" && req.body.lastName.trim().length > 0
-      ? req.body.lastName.trim()
-      : false;
-
-  const email =
-    typeof req.body.email === "string"
-      ? req.body.email.trim().toLowerCase()
-      : false;
-
-  const password =
-    typeof req.body.password === "string" && req.body.password.trim().length > 0
-      ? req.body.password.trim()
-      : false;
-
-  const tosAgreement =
-    typeof req.body.tosAgreement === "boolean" && req.body.tosAgreement === true
-      ? true
-      : false;
-
-  if (firstName && lastName && email && password && tosAgreement) {
+  if (!missingOrInvalidFields.length) {
     // Make sure the user doesnt already exist
     try {
-      // const hashedPassword = helpers.password.hash(password);
-
-      const objToCreate = {
-        firstName,
-        lastName,
-        email,
-        password,
-        tosAgreement: true,
-      };
+      const objToCreate = req.body;
 
       const id = User.getModelId(objToCreate);
       const user = await User.findOne(id);
@@ -94,6 +63,7 @@ methods.post = async function (req, res) {
       res.sendStatus(500);
     }
   } else {
+    helpers.log.error(`Missing fields ${missingOrInvalidFields.toString()}`);
     res.sendStatus(400);
   }
 

@@ -1,5 +1,6 @@
 module.exports = {
-  attributtes: {
+  tableName: "items",
+  attributes: {
     order: {
       type: "string",
       required: true,

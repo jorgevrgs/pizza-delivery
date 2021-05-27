@@ -1,32 +1,22 @@
+// @see http://www.thepenguinpizza.com/pizzamenu
 module.exports = {
-  attributtes: {
+  tableName: "menus",
+  attributes: {
     name: {
       type: "string",
       required: true,
+      example: "The ULTIMATE Penguin",
     },
     ingredients: {
-      type: "object",
+      type: "string",
       required: true,
-      model: "Food",
-      example: [
-        {
-          id: "abcd1234",
-          name: "Hamburger Buns",
-          quantity: 1,
-          uom: "unit",
-        },
-        {
-          id: "fghj4321",
-          name: "Ground Beef Patties",
-          quantity: 100,
-          uom: "gr",
-        },
-      ],
+      example:
+        "Bacon, ham, meatball, sweet sausage, roasted potato, hot cherry peppers, caramelized onions",
     },
     price: {
       type: "number",
       required: true,
-      example: 99.99,
+      example: 19.99,
     },
   },
 };
