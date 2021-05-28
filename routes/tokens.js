@@ -106,7 +106,7 @@ methods.get = async function (req, res) {
 // Tokens - put
 // Required data: id, extend
 // Optional data: none
-methods.put = function (req, callback) {
+methods.put = async function (req, res) {
   const id =
     typeof req.body.id === "string" && req.body.id.trim().length === 20
       ? req.body.id.trim()
@@ -118,36 +118,28 @@ methods.put = function (req, callback) {
       : false;
 
   if (id && extend) {
-    // Lookup the existing token
-    _data.read("tokens", id, function (err, tokenData) {
-      if (!err && tokenData) {
+    try {
+      // Lookup the existing token
+      const tokenData = await Token.findOne(id);
+
+      if (tokenData) {
         // Check to make sure the token isn't already expired
         if (tokenData.expires > Date.now()) {
           // Set the expiration an hour from now
           tokenData.expires = Date.now() + 1000 * 60 * 60;
-          // Store the new updates
-          _data.update("tokens", id, tokenData, function (err) {
-            if (!err) {
-              callback(200);
-            } else {
-              callback(500, {
-                Error: "Could not update the token's expiration.",
-              });
-            }
-          });
-        } else {
-          callback(400, {
-            Error: "The token has already expired, and cannot be extended.",
-          });
+
+          await Token.update(id, tokenData);
+          res.sendStatus(200);
         }
       } else {
-        callback(400, { Error: "Specified user does not exist." });
+        res.sendStatus(404);
       }
-    });
+    } catch (error) {
+      helpers.log.error(error);
+      res.sendStatus(500);
+    }
   } else {
-    callback(400, {
-      Error: "Missing required field(s) or field(s) are invalid.",
-    });
+    res.sendStatus(400);
   }
 };
 
