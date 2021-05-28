@@ -1,18 +1,17 @@
 module.exports = class Response {
   constructor() {
-    // @TODO: prototype
-    this._responseType = "json";
-    this._payload = "";
-    this._statusCode = null;
-    this._headers = {};
-    this._body = "";
+    this.responseType = "json";
+    this.payload = "";
+    this.statusCode = null;
+    this.headers = {};
+    this.body = "";
   }
 
   /**
    * Body is the parsed string response
    */
   getBody() {
-    return this._body;
+    return this.body;
   }
 
   /**
@@ -20,14 +19,14 @@ module.exports = class Response {
    * @param {string} body Body content
    */
   setBody(body) {
-    this._body = body;
+    this.body = body;
   }
 
   /**
    * Headers are the object containing the key value headers
    */
   getHeaders() {
-    return this._headers;
+    return this.headers;
   }
 
   /**
@@ -36,14 +35,14 @@ module.exports = class Response {
    * @param {string} value Headers value
    */
   setHeaders(key, value) {
-    this._headers[key] = value;
+    this.headers[key] = value;
   }
 
   /**
    * Original body content
    */
   getPayload() {
-    return this._payload;
+    return this.payload;
   }
 
   /**
@@ -51,14 +50,14 @@ module.exports = class Response {
    * @param {ref} payload
    */
   setPayload(payload) {
-    this._payload = payload;
+    this.payload = payload;
   }
 
   /**
    * Response type to use with `this.send()`
    */
   getResponseType() {
-    return this._responseType;
+    return this.responseType;
   }
 
   /**
@@ -66,14 +65,14 @@ module.exports = class Response {
    * @param {ref} responseType
    */
   setResponseType(responseType) {
-    this._responseType = responseType;
+    this.responseType = responseType;
   }
 
   /**
    * Status code to use with `res.writeHead(statusCode)`
    */
   getStatusCode() {
-    return this._statusCode;
+    return this.statusCode;
   }
 
   /**
@@ -81,7 +80,7 @@ module.exports = class Response {
    * @param {ref} statusCode
    */
   setStatusCode(statusCode) {
-    this._statusCode = statusCode;
+    this.statusCode = statusCode;
   }
 
   /**
@@ -107,6 +106,9 @@ module.exports = class Response {
     }
   }
 
+  /**
+   * Set Json headers and body
+   */
   json() {
     this.setHeaders("Content-Type", "application/json");
     this.setBody(JSON.stringify(this.getPayload()));

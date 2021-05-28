@@ -16,17 +16,13 @@ module.exports = async function (req, res) {
   try {
     const acceptableMethods = ["get"];
     if (acceptableMethods.indexOf(req.method) > -1) {
-      const result = await methods[req.method](req, res);
-      req = result.req;
-      res = result.res;
+      await methods[req.method](req, res);
     } else {
       res.sendStatus(405);
     }
   } catch (error) {
     helpers.log.error(error);
     res.sendStatus(500);
-  } finally {
-    return { req, res };
   }
 };
 
@@ -45,7 +41,5 @@ methods.get = async function (req, res) {
   } catch (error) {
     helpers.log.error(error);
     res.sendStatus(500);
-  } finally {
-    return { req, res };
   }
 };

@@ -8,10 +8,9 @@ module.exports = async function (app) {
   const chosenHandler = route.getRoute();
 
   // Run route
-  const result = await chosenHandler(app.req, app.res);
-
-  app.req = result.req;
-  app.res = result.res;
-
-  return app;
+  try {
+    await chosenHandler(app.req, app.res);
+  } catch (error) {
+    app.helpers.log.error(error);
+  }
 };

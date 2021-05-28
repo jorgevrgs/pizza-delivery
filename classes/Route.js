@@ -14,21 +14,15 @@ module.exports = class Route {
         body: req.getBody(),
         query: req.query,
       });
-
-      return { req, res };
     };
 
     // Not-Found
     routes.notFound = function (_req, res) {
       res.sendStatus(404);
-
-      return { req, res };
     };
 
     routes.clientError = function (_req, res) {
       res.sendStatus(res.getStatusCode());
-
-      return { req, res };
     };
 
     this.setRoutes(routes);

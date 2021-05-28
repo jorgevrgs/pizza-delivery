@@ -32,8 +32,15 @@ module.exports = class App {
     this.helpers.log.info(`${this.req.method} ${this.req.url}`);
 
     for (let i of Object.keys(this.middlewares)) {
-      if (!this.finished) {
-        Object.assign(this, await this.middlewares[i](this));
+      try {
+        if (this.res.getStatusCode() !== null) {
+          await this.middlewares.response(this);
+          break;
+        } else {
+          await this.middlewares[i](this);
+        }
+      } catch (error) {
+        this.app.helpers.log.error(error);
       }
     }
   }
