@@ -130,6 +130,8 @@ methods.put = async function (req, res) {
 
           await Token.update(id, tokenData);
           res.sendStatus(200);
+        } else {
+          res.sendStatus(403);
         }
       } else {
         res.sendStatus(404);
