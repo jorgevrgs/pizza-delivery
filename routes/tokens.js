@@ -19,7 +19,7 @@ module.exports = async function (req, res) {
     }
   } catch (error) {
     helpers.log.error(error);
-    res.sendStatus(500);
+    res.internalServerError(error.message);
   }
 };
 
@@ -59,14 +59,15 @@ methods.post = async function (req, res) {
 
           res.send({ token: tokenString });
         } else {
-          res.sendStatus(401);
+          res.unauthorized("Wrong user or password");
         }
       } else {
-        res.sendStatus(400);
+        res.unauthorized("Wrong user or password");
       }
     }
   } catch (error) {
-    res.send(500, error.message);
+    helpers.log.error(error);
+    res.internalServerError(error.message);
   }
 };
 
@@ -90,16 +91,17 @@ methods.get = async function (req, res) {
         if (response) {
           res.send(response);
         } else {
-          res.sendStatus(404);
+          res.notFound("Token not found");
         }
       } else {
-        res.sendStatus(400);
+        res.badRequest("Wrong token value");
       }
     } else {
-      res.sendStatus(400);
+      res.badRequest("Missing required param");
     }
   } catch (error) {
-    res.sendStatus(500);
+    helpers.log.error(error);
+    res.internalServerError(error.message);
   }
 };
 
@@ -129,19 +131,19 @@ methods.put = async function (req, res) {
           tokenData.expires = Date.now() + 1000 * 60 * 60;
 
           await Token.update(id, tokenData);
-          res.sendStatus(200);
+          res.success();
         } else {
-          res.sendStatus(403);
+          res.forbidden("Token expired");
         }
       } else {
-        res.sendStatus(404);
+        res.notFound("Token not found");
       }
     } catch (error) {
       helpers.log.error(error);
-      res.sendStatus(500);
+      res.internalServerError(error.message);
     }
   } else {
-    res.sendStatus(400);
+    res.badRequest("Missing required params");
   }
 };
 

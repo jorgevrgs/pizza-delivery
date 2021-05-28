@@ -160,7 +160,7 @@ module.exports = class Response {
         break;
       case 429:
         this.setStatusCode(429);
-        this.setPayload("Too Many Requests ");
+        this.setPayload("Too Many Requests");
         break;
       case 500:
         this.setStatusCode(500);
@@ -170,5 +170,60 @@ module.exports = class Response {
         this.setStatusCode(code);
         this.setPayload(code);
     }
+  }
+
+  success(payload = "OK") {
+    this.setStatusCode(200);
+    this.setPayload(payload);
+  }
+
+  created(payload = "Created") {
+    this.setStatusCode(201);
+    this.setPayload(payload);
+  }
+
+  noContent(payload = "") {
+    this.setStatusCode(204);
+    this.setPayload(payload);
+  }
+
+  badRequest(payload = "Bad Request") {
+    this.setStatusCode(400);
+    this.setPayload(payload);
+  }
+
+  unauthorized(payload = "Unauthorized") {
+    this.setStatusCode(401);
+    this.setPayload(payload);
+  }
+
+  forbidden(payload = "Forbidden") {
+    this.setStatusCode(403);
+    this.setPayload(payload);
+  }
+
+  notFound(payload = "Not Found") {
+    this.setStatusCode(404);
+    this.setPayload(payload);
+  }
+
+  methodNotAllowed(payload = "Method Not Allowed") {
+    this.setStatusCode(405);
+    this.setPayload(payload);
+  }
+
+  conflict(payload = "Conflict") {
+    this.setStatusCode(409);
+    this.setPayload(payload);
+  }
+
+  tooManyRequests(payload = "Too Many Requests") {
+    this.setStatusCode(429);
+    this.setPayload(payload);
+  }
+
+  internalServerError(payload = "Internal Server Error") {
+    this.setStatusCode(500);
+    this.setPayload(payload);
   }
 };
